@@ -8,15 +8,13 @@ public class PlayerSettings : NetworkBehaviour
 {
     [SerializeField] private SkinnedMeshRenderer skinnedMeshRenderer;
     [SerializeField] private TextMeshProUGUI playerName;
+    public List<Color> colors = new List<Color>();
+
     private NetworkVariable<FixedString128Bytes> networkPlayerName = new NetworkVariable<FixedString128Bytes>(
         "Player: 0", NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
 
-    public NetworkVariable<int> OwnerTeamId = new NetworkVariable<int>(
-    value: 0,
-    NetworkVariableReadPermission.Everyone,
-    NetworkVariableWritePermission.Server);
-
-    public List<Color> colors = new List<Color>();
+    private NetworkVariable<int> ownerTeamId = new NetworkVariable<int>(
+        0, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
 
     private void Awake()
     {
@@ -26,21 +24,37 @@ public class PlayerSettings : NetworkBehaviour
     public override void OnNetworkSpawn()
     {
         networkPlayerName.Value = "Player: " + (OwnerClientId + 1);
-        if (playerName != null) playerName.text = networkPlayerName.Value.ToString();
+
+        if (playerName != null)
+            playerName.text = networkPlayerName.Value.ToString();
+
+        UpdateTeamColor(ownerTeamId.Value);
+
+        // Підписуємось на зміну команди
+        ownerTeamId.OnValueChanged += (oldValue, newValue) =>
+        {
+            UpdateTeamColor(newValue);
+        };
     }
 
-    [ServerRpc]
-    public void SetTeamColorServerRpc(int teamId)
+    private void UpdateTeamColor(int teamIndex)
     {
-        OwnerTeamId.Value = teamId;
-        SetTeamColorClientRpc(teamId);
+        if (teamIndex >= 0 && teamIndex < colors.Count)
+        {
+            Material newMaterial = new Material(skinnedMeshRenderer.material);
+            newMaterial.color = colors[teamIndex];
+            skinnedMeshRenderer.material = newMaterial;
+        }
     }
 
-    [ClientRpc]
-    private void SetTeamColorClientRpc(int teamId)
+    public void RequestChangeTeamColor(int teamIndex)
     {
-        Material newMaterial = new Material(skinnedMeshRenderer.material);
-        newMaterial.color = colors[teamId];
-        skinnedMeshRenderer.material = newMaterial;
+        SetTeamColorServerRpc(teamIndex);
+    }
+
+    [ServerRpc(RequireOwnership = false)]
+    private void SetTeamColorServerRpc(int teamIndex)
+    {
+        ownerTeamId.Value = teamIndex;
     }
 }

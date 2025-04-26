@@ -23,13 +23,19 @@ public class GameMenu : MonoBehaviour
         Cursor.visible = true;
 
         GameObject[] players = GameObject.FindGameObjectsWithTag("Player");
-        if (players.Length > 0)
+        foreach (var player in players)
         {
-            playerSettings = players[0].GetComponent<PlayerSettings>();
+            var settings = player.GetComponent<PlayerSettings>();
+            if (settings != null && settings.IsOwner)
+            {
+                playerSettings = settings;
+                break;
+            }
         }
-        else
+
+        if (playerSettings == null)
         {
-            Debug.LogWarning("No player objects found with tag 'Player'");
+            Debug.LogWarning("Local player not found for GameMenu.");
         }
     }
 
@@ -43,12 +49,12 @@ public class GameMenu : MonoBehaviour
         Instance = this;
 
         leftTeamButton.onClick.AddListener(() => {
-            playerSettings.SetTeamColorServerRpc(0);
+            playerSettings.RequestChangeTeamColor(0);
             GameMenuDeactivate();
         });
 
         rightTeamButton.onClick.AddListener(() => {
-            playerSettings.SetTeamColorServerRpc(1);
+            playerSettings.RequestChangeTeamColor(1);
             GameMenuDeactivate();
         });
 
