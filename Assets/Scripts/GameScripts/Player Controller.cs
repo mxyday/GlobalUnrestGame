@@ -5,6 +5,7 @@ using UnityEngine;
 public class PlayerMovement : NetworkBehaviour, IDamageable
 {
     [SerializeField] GameObject aimTransform;
+    [SerializeField] GameObject cameraObject;
 
     [SerializeField] float mouseSensitivity, sprintSpeed, walkSpeed, jumpForce, smoothTime;
 
@@ -27,6 +28,7 @@ public class PlayerMovement : NetworkBehaviour, IDamageable
         if (!IsOwner)
         {
             aimTransform.SetActive(false);
+            cameraObject.SetActive(false);
         }
     }
 
