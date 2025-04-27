@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class PlayerMovement : NetworkBehaviour, IDamageable
 {
-    [SerializeField] GameObject cameraHolder;
+    [SerializeField] GameObject aimTransform;
 
     [SerializeField] float mouseSensitivity, sprintSpeed, walkSpeed, jumpForce, smoothTime;
 
@@ -26,7 +26,7 @@ public class PlayerMovement : NetworkBehaviour, IDamageable
     {
         if (!IsOwner)
         {
-            cameraHolder.SetActive(false);
+            aimTransform.SetActive(false);
         }
     }
 
@@ -78,7 +78,7 @@ public class PlayerMovement : NetworkBehaviour, IDamageable
         verticalLookRotation += Input.GetAxisRaw("Mouse Y") * mouseSensitivity;
         verticalLookRotation = Mathf.Clamp(verticalLookRotation, -90f, 90f);
 
-        cameraHolder.transform.localEulerAngles = Vector3.left * verticalLookRotation;
+        aimTransform.transform.localEulerAngles = Vector3.left * verticalLookRotation;
 
         UpdateRotationServerRpc(transform.rotation);
     }
