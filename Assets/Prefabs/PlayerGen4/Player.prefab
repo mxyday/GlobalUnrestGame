@@ -273,6 +273,7 @@ MonoBehaviour:
   ItemInfo: {fileID: 11400000, guid: 79314b4a26c6d074383dfa10c9c4cc99, type: 2}
   ItemGameObject: {fileID: 827777954189178395}
   cam: {fileID: 5525144795607807206}
+  hitEffectPrefab: {fileID: 2856241766972156004, guid: 3b8512c5364f1e74492db375abf6050c, type: 3}
 --- !u!1 &818174077112690169
 GameObject:
   m_ObjectHideFlags: 0
@@ -774,6 +775,7 @@ MonoBehaviour:
   ItemInfo: {fileID: 11400000, guid: 438a472d50bfaeb46b08a0c910490dc3, type: 2}
   ItemGameObject: {fileID: 2410625690974745554}
   cam: {fileID: 5525144795607807206}
+  hitEffectPrefab: {fileID: 2856241766972156004, guid: 3b8512c5364f1e74492db375abf6050c, type: 3}
 --- !u!1 &4653955284353702482
 GameObject:
   m_ObjectHideFlags: 0
