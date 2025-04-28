@@ -23,6 +23,8 @@ public class PlayerMovement : NetworkBehaviour, IDamageable
     private float moveSpeed = 5f;
     private Animator animator;
 
+    bool isAlive = true;
+
     private void Start()
     {
         if (!IsOwner)
@@ -42,6 +44,8 @@ public class PlayerMovement : NetworkBehaviour, IDamageable
     private void Update()
     {
         if (!IsOwner) return;
+
+        if (!isAlive) return;
 
         Look();
 
@@ -183,12 +187,12 @@ public class PlayerMovement : NetworkBehaviour, IDamageable
         health -= damage;
         if (health <= 0)
         {
-            Death();
+            Die();
         }
     }
 
-    private void Death()
+    public void Die()
     {
-        Destroy(gameObject);
+        isAlive = false;
     }
 }
