@@ -272,8 +272,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   ItemInfo: {fileID: 11400000, guid: 79314b4a26c6d074383dfa10c9c4cc99, type: 2}
   ItemGameObject: {fileID: 827777954189178395}
-  cam: {fileID: 5525144795607807206}
+  shootPoint: {fileID: 5883081966081896682}
   hitEffectPrefab: {fileID: 2856241766972156004, guid: 3b8512c5364f1e74492db375abf6050c, type: 3}
+  aimTarget: {fileID: 3825458581675436855}
 --- !u!1 &818174077112690169
 GameObject:
   m_ObjectHideFlags: 0
@@ -306,6 +307,37 @@ Transform:
   - {fileID: 891197876672799380}
   - {fileID: 5564126925249554320}
   m_Father: {fileID: 8478273164834886250}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1038175077496377571
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 5883081966081896682}
+  m_Layer: 0
+  m_Name: shootPoint
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &5883081966081896682
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1038175077496377571}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0.7071068, y: -3.9398846e-33, z: 3.9398846e-33, w: 0.7071068}
+  m_LocalPosition: {x: 0, y: -0.0051, z: 0.0005888879}
+  m_LocalScale: {x: 0.01111111, y: 0.0111111095, z: 0.0111111095}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 15493241883864225}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &2410625690974745554
 GameObject:
@@ -727,6 +759,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   aimTransform: {fileID: 5396523771475574300}
   distance: 50
+  recoilRecoverySpeed: 5
 --- !u!1 &4306085085354049472
 GameObject:
   m_ObjectHideFlags: 0
@@ -774,8 +807,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   ItemInfo: {fileID: 11400000, guid: 438a472d50bfaeb46b08a0c910490dc3, type: 2}
   ItemGameObject: {fileID: 2410625690974745554}
-  cam: {fileID: 5525144795607807206}
+  shootPoint: {fileID: 0}
   hitEffectPrefab: {fileID: 2856241766972156004, guid: 3b8512c5364f1e74492db375abf6050c, type: 3}
+  aimTarget: {fileID: 3825458581675436855}
 --- !u!1 &4653955284353702482
 GameObject:
   m_ObjectHideFlags: 0
@@ -1536,7 +1570,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: bc5e7d92a812eb0498340e17a719cc07, type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -1547,6 +1581,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: -8679921383154817045, guid: bc5e7d92a812eb0498340e17a719cc07, type: 3}
       insertIndex: -1
       addedObject: {fileID: 3935987010195440309}
+    - targetCorrespondingSourceObject: {fileID: -8679921383154817045, guid: bc5e7d92a812eb0498340e17a719cc07, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 5883081966081896682}
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: bc5e7d92a812eb0498340e17a719cc07, type: 3}
 --- !u!4 &15493241883864225 stripped

@@ -3,8 +3,16 @@ using UnityEngine;
 
 public class SingleShotGun : Gun
 {
-    [SerializeField] Camera cam;
+    [SerializeField] private Transform shootPoint;
     [SerializeField] GameObject hitEffectPrefab;
+    [SerializeField] GameObject aimTarget;
+
+    private AimTargetController aimTargetController;
+
+    private void Start()
+    {
+        aimTargetController = aimTarget.GetComponent<AimTargetController>();
+    }
 
     public override void Use()
     {
@@ -14,20 +22,20 @@ public class SingleShotGun : Gun
     void Shoot()
     {
         Debug.Log("Shoot fired");
-        Ray ray = cam.ViewportPointToRay(new Vector3 (0.5f, 0.5f));
-        ray.origin = cam.transform.position;
-        if(Physics.Raycast(ray, out RaycastHit hit))
+        aimTargetController.ApplyRecoil(2f);
+
+        Ray ray = new Ray(shootPoint.position, shootPoint.forward);
+        if (Physics.Raycast(ray, out RaycastHit hit))
         {
             Debug.Log("Shoot hit");
 
             if (hitEffectPrefab != null)
             {
                 GameObject hitEffect = Instantiate(hitEffectPrefab, hit.point, Quaternion.LookRotation(hit.normal));
-                Destroy(hitEffect, 2f); // через 2 секунди ефект сам видаляється
+                Destroy(hitEffect, 2f);
             }
 
             hit.collider.gameObject.GetComponent<IDamageable>()?.TakeDamage(((GunInfo)ItemInfo).damage);
         }
     }
 }
-
