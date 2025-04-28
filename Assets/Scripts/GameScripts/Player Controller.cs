@@ -75,13 +75,20 @@ public class PlayerMovement : NetworkBehaviour, IDamageable
         {
             return;
         }
+
+        // Обертання гравця вліво/вправо по горизонталі (Yaw)
         transform.Rotate(Vector3.up * Input.GetAxisRaw("Mouse X") * mouseSensitivity);
 
+        // Обертання камери вгору/вниз по вертикалі (Pitch)
         verticalLookRotation += Input.GetAxisRaw("Mouse Y") * mouseSensitivity;
-        verticalLookRotation = Mathf.Clamp(verticalLookRotation, -90f, 90f);
 
-        aimTransform.transform.localEulerAngles = Vector3.left * verticalLookRotation;
+        // Клэмпимо вертикальний кут у межах -75 до +75
+        verticalLookRotation = Mathf.Clamp(verticalLookRotation, -75f, 75f);
 
+        // Обновляємо поворот aimTransform тільки по X осі (інверсія напряму)
+        aimTransform.transform.localEulerAngles = new Vector3(-verticalLookRotation, 0f, 0f);
+
+        // Відправляємо оновлення на сервер
         UpdateRotationServerRpc(transform.rotation);
     }
 

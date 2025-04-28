@@ -10,6 +10,6 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 43f17c6699a8d7d42b6d0fee9ff39aa8, type: 3}
-  m_Name: Pistol
+  m_Name: Bandage
   m_EditorClassIdentifier: 
   itemName: Pistol
