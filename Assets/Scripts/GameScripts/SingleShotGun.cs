@@ -1,17 +1,23 @@
-using Unity.VisualScripting;
 using UnityEngine;
+using Unity.Netcode;
 
-public class SingleShotGun : Gun
+public class SingleShotGun : Gun  // Змініть наслідування
 {
     [SerializeField] private Transform shootPoint;
-    [SerializeField] GameObject hitEffectPrefab;
-    [SerializeField] GameObject aimTarget;
+    [SerializeField] private GameObject hitEffectPrefab;
+    [SerializeField] private GameObject aimTarget;
+    [SerializeField] private NetworkHitEffect networkHitEffect;
 
     private AimTargetController aimTargetController;
 
     private void Start()
     {
         aimTargetController = aimTarget.GetComponent<AimTargetController>();
+
+        if (networkHitEffect == null)
+        {
+            networkHitEffect = GetComponent<NetworkHitEffect>();
+        }
     }
 
     public override void Use()
@@ -19,7 +25,7 @@ public class SingleShotGun : Gun
         Shoot();
     }
 
-    void Shoot()
+    private void Shoot()
     {
         Debug.Log("Shoot fired");
         aimTargetController.ApplyRecoil(2f);
@@ -29,13 +35,22 @@ public class SingleShotGun : Gun
         {
             Debug.Log("Shoot hit");
 
-            if (hitEffectPrefab != null)
+            // Обробка ефекту
+            if (networkHitEffect != null)
+            {
+                networkHitEffect.PlayEffect(hit.point, hit.normal);
+            }
+            else if (hitEffectPrefab != null)
             {
                 GameObject hitEffect = Instantiate(hitEffectPrefab, hit.point, Quaternion.LookRotation(hit.normal));
                 Destroy(hitEffect, 2f);
             }
 
-            hit.collider.gameObject.GetComponent<IDamageable>()?.TakeDamage(((GunInfo)ItemInfo).damage);
+            // Обробка пошкоджень тільки на сервері
+            if (NetworkManager.Singleton.IsServer)
+            {
+                hit.collider.gameObject.GetComponent<IDamageable>()?.TakeDamage(((GunInfo)ItemInfo).damage);
+            }
         }
     }
 }
