@@ -64,6 +64,11 @@ public class PlayerMovement : NetworkBehaviour, IDamageable
         {
             items[itemIndex].Use();
         }
+
+        if (Input.GetKeyDown(KeyCode.K))
+        {
+            Die();
+        }
     }
 
     private void HandleMovementInput()
@@ -194,5 +199,6 @@ public class PlayerMovement : NetworkBehaviour, IDamageable
     public void Die()
     {
         isAlive = false;
+        GetComponent<RagdollActivator>()?.ActivateRagdoll();
     }
 }
