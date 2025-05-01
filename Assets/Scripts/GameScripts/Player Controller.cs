@@ -23,7 +23,7 @@ public class PlayerMovement : NetworkBehaviour, IDamageable
     private float moveSpeed = 5f;
     private Animator animator;
 
-    bool isAlive = true;
+    private bool isAlive = true;
 
     private void Start()
     {
@@ -197,6 +197,12 @@ public class PlayerMovement : NetworkBehaviour, IDamageable
     }
 
     public void Die()
+    {
+        ActivateRagdollClientRpc();
+    }
+
+    [ClientRpc]
+    private void ActivateRagdollClientRpc()
     {
         isAlive = false;
         GetComponent<RagdollActivator>()?.ActivateRagdoll();

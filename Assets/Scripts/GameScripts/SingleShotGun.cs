@@ -46,11 +46,19 @@ public class SingleShotGun : Gun  // «м≥н≥ть насл≥дуванн€
                 Destroy(hitEffect, 2f);
             }
 
-            // ќбробка пошкоджень т≥льки на сервер≥
-            if (NetworkManager.Singleton.IsServer)
+            if (hit.collider.TryGetComponent<NetworkObject>(out var targetNetworkObject))
             {
-                hit.collider.gameObject.GetComponent<IDamageable>()?.TakeDamage(((GunInfo)ItemInfo).damage);
+                ApplyDamageServerRpc(targetNetworkObject, ((GunInfo)ItemInfo).damage);
             }
+        }
+    }
+
+    [ServerRpc]
+    private void ApplyDamageServerRpc(NetworkObjectReference targetRef, float damage)
+    {
+        if (targetRef.TryGet(out NetworkObject target))
+        {
+            target.GetComponent<IDamageable>()?.TakeDamage(damage);
         }
     }
 }

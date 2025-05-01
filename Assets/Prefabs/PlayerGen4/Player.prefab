@@ -1814,7 +1814,7 @@ PrefabInstance:
       addedObject: {fileID: 6141721333076682028}
     - targetCorrespondingSourceObject: {fileID: -2084811680363313996, guid: 0868c1c33214b4b489ebebcaa528e27d, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 3321331284033345107}
+      addedObject: {fileID: 1216907020187900800}
     - targetCorrespondingSourceObject: {fileID: -2084811680363313996, guid: 0868c1c33214b4b489ebebcaa528e27d, type: 3}
       insertIndex: -1
       addedObject: {fileID: 894112097997071959}
@@ -1841,7 +1841,7 @@ PrefabInstance:
       addedObject: {fileID: 1952238378067435100}
     - targetCorrespondingSourceObject: {fileID: -751476226918971245, guid: 0868c1c33214b4b489ebebcaa528e27d, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 8946768087467235707}
+      addedObject: {fileID: 7358099846183713401}
     - targetCorrespondingSourceObject: {fileID: -751476226918971245, guid: 0868c1c33214b4b489ebebcaa528e27d, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1157101856164056979}
@@ -1908,8 +1908,8 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: -751476226918971245, guid: 0868c1c33214b4b489ebebcaa528e27d, type: 3}
   m_PrefabInstance: {fileID: 8123379810951594501}
   m_PrefabAsset: {fileID: 0}
---- !u!136 &8946768087467235707
-CapsuleCollider:
+--- !u!65 &7358099846183713401
+BoxCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -1926,11 +1926,9 @@ CapsuleCollider:
   m_IsTrigger: 0
   m_ProvidesContacts: 0
   m_Enabled: 1
-  serializedVersion: 2
-  m_Radius: 0.06
-  m_Height: 0.33
-  m_Direction: 1
-  m_Center: {x: -0.01, y: 0.09000005, z: 0.01849614}
+  serializedVersion: 3
+  m_Size: {x: 0.1, y: 0.15, z: 0.07}
+  m_Center: {x: 0, y: 0.13, z: 0.05}
 --- !u!54 &1157101856164056979
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -2230,7 +2228,7 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 0.36221993, y: 0.28, z: 0.24129218}
+  m_Size: {x: 0.29, y: 0.28, z: 0.24129218}
   m_Center: {x: 0.00000016391277, y: 0.13, z: 0.0031237528}
 --- !u!54 &1678675436919348257
 Rigidbody:
@@ -2310,8 +2308,8 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: -2084811680363313996, guid: 0868c1c33214b4b489ebebcaa528e27d, type: 3}
   m_PrefabInstance: {fileID: 8123379810951594501}
   m_PrefabAsset: {fileID: 0}
---- !u!136 &3321331284033345107
-CapsuleCollider:
+--- !u!65 &1216907020187900800
+BoxCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -2328,11 +2326,9 @@ CapsuleCollider:
   m_IsTrigger: 0
   m_ProvidesContacts: 0
   m_Enabled: 1
-  serializedVersion: 2
-  m_Radius: 0.06
-  m_Height: 0.33
-  m_Direction: 1
-  m_Center: {x: 0.01, y: 0.09000005, z: 0.018496145}
+  serializedVersion: 3
+  m_Size: {x: 0.1, y: 0.15, z: 0.07}
+  m_Center: {x: 0, y: 0.13, z: 0.05}
 --- !u!54 &894112097997071959
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -3420,6 +3416,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7e460dcf34b412d4fb890f8980e93bed, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  ShowTopMostFoldoutHeaderGroup: 1
   animator: {fileID: 2438311414156836756}
   ragdollBodies:
   - {fileID: 7467828311572176127}
@@ -3439,10 +3436,10 @@ MonoBehaviour:
   - {fileID: 5492504504769060779}
   - {fileID: 8989049240782229459}
   - {fileID: 8431646676041461944}
-  - {fileID: 3321331284033345107}
+  - {fileID: 1216907020187900800}
   - {fileID: 1009853371187193540}
   - {fileID: 7620702825781651038}
-  - {fileID: 8946768087467235707}
+  - {fileID: 7358099846183713401}
   - {fileID: 949995154075891251}
   - {fileID: 3636513095899291231}
   - {fileID: 3916643776250974645}
