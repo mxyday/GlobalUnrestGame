@@ -2,7 +2,7 @@ using Unity.Netcode;
 using Unity.VisualScripting;
 using UnityEngine;
 
-public class PlayerMovement : NetworkBehaviour, IDamageable
+public class PlayerController : NetworkBehaviour, IDamageable
 {
     [SerializeField] GameObject aimTransform;
     [SerializeField] GameObject cameraObject;
@@ -206,5 +206,10 @@ public class PlayerMovement : NetworkBehaviour, IDamageable
     {
         isAlive = false;
         GetComponent<RagdollActivator>()?.ActivateRagdoll();
+    }
+
+    public void Resurrect()
+    {
+        isAlive = true;
     }
 }

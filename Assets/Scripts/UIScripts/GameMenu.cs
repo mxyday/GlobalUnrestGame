@@ -6,12 +6,17 @@ public class GameMenu : MonoBehaviour
 {
     public static GameMenu Instance { get; private set; }
 
-    [SerializeField] private Button leftTeamButton;
-    [SerializeField] private Button rightTeamButton;
+    [SerializeField] private Button aTeamButton;
+    [SerializeField] private Button bTeamButton;
     [SerializeField] private Button resumeButton;
     [SerializeField] private Button mainMenuButton;
     [SerializeField] private Button quitButton;
+    [SerializeField] private Button changeTeamButton;
+    [SerializeField] private Button changeWeaponButton;
+    [SerializeField] private Button respawnButton;
     [SerializeField] private GameObject gameMenu;
+    [SerializeField] private GameObject teamSelectMenu;
+    [SerializeField] private GameObject weaponSelectMenu;
 
     private PlayerSettings localPlayerSettings;
 
@@ -48,14 +53,31 @@ public class GameMenu : MonoBehaviour
         }
         Instance = this;
 
-        leftTeamButton.onClick.AddListener(() => {
-            playerSettings.RequestChangeTeamColor(0);
+        changeTeamButton.onClick.AddListener(() =>
+        {
+            gameMenu.SetActive(false);
+            teamSelectMenu.SetActive(true);
+        });
+
+        changeWeaponButton.onClick.AddListener(() =>
+        {
+
+        });
+
+        respawnButton.onClick.AddListener(() =>
+        {
+            playerSettings.Respawn();
             GameMenuDeactivate();
         });
 
-        rightTeamButton.onClick.AddListener(() => {
-            playerSettings.RequestChangeTeamColor(1);
-            GameMenuDeactivate();
+        aTeamButton.onClick.AddListener(() => {
+            playerSettings.RequestChangeTeam(0);
+            TeamSelectMenuDeactivate();
+        });
+
+        bTeamButton.onClick.AddListener(() => {
+            playerSettings.RequestChangeTeam(1);
+            TeamSelectMenuDeactivate();
         });
 
         resumeButton.onClick.AddListener(() =>
@@ -96,5 +118,12 @@ public class GameMenu : MonoBehaviour
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
         gameMenu.SetActive(false);
+    }
+
+    private void TeamSelectMenuDeactivate()
+    {
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
+        teamSelectMenu.SetActive(false);
     }
 }

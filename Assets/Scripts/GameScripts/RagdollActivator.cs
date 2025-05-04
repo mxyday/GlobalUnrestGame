@@ -23,8 +23,17 @@ public class RagdollActivator : NetworkBehaviour
         if (mainRigidbody != null) mainRigidbody.isKinematic = true;
 
         SetRagdollState(true);
-
         ActivateRagdollServerRpc();
+    }
+
+    public void DeactivateRagdoll()
+    {
+        animator.enabled = true;
+
+        if (mainCollider != null) mainCollider.enabled = true;
+        if (mainRigidbody != null) mainRigidbody.isKinematic = false;
+
+        SetRagdollState(false);
     }
 
     [ServerRpc(RequireOwnership = false)]

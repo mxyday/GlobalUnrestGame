@@ -3370,9 +3370,12 @@ MonoBehaviour:
   ShowTopMostFoldoutHeaderGroup: 1
   skinnedMeshRenderer: {fileID: 2879891509521750518}
   playerName: {fileID: 6221149336947970691}
+  ragdollActivator: {fileID: 1998378483495392854}
+  playerController: {fileID: -603364395625309701}
   colors:
   - {r: 0, g: 1, b: 0.91636705, a: 0}
   - {r: 1, g: 0.68167484, b: 0, a: 0}
+  spawnPoint: {fileID: 0}
 --- !u!114 &4490318952016076923
 MonoBehaviour:
   m_ObjectHideFlags: 0

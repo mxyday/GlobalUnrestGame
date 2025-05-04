@@ -26,7 +26,7 @@ public class GameMultiplayer : NetworkBehaviour
     private NetworkList<PlayerData> playerDataNetworkList;
     private string playerName;
 
-
+    private SpawnPointManager spawnPointManager;
 
     private void Awake()
     {
@@ -132,5 +132,18 @@ public class GameMultiplayer : NetworkBehaviour
             }
         }
         return default;
+    }
+
+    private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+    {
+        spawnPointManager = FindFirstObjectByType<SpawnPointManager>();
+    }
+
+    public List<GameObject> GetSpawnPoints()
+    {
+        if (spawnPointManager != null)
+            return spawnPointManager.spawnPoints;
+        else
+            return null;
     }
 }
