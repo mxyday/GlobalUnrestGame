@@ -1,11 +1,17 @@
 using Unity.Netcode;
 using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.Animations.Rigging;
 
 public class PlayerController : NetworkBehaviour, IDamageable
 {
+    [SerializeField] RigBuilder rigBuilder;
     [SerializeField] GameObject aimTransform;
     [SerializeField] GameObject cameraObject;
+    [SerializeField] private Transform adsPosition;
+    [SerializeField] private Transform owPosition;
+    [SerializeField] private Transform weaponRoot;
+    [SerializeField] private float aimSpeed = 10f;
 
     [SerializeField] float mouseSensitivity, sprintSpeed, walkSpeed, jumpForce, smoothTime;
 
@@ -24,6 +30,7 @@ public class PlayerController : NetworkBehaviour, IDamageable
     private Animator animator;
 
     private bool isAlive = true;
+    private bool isAiming;
 
     private void Start()
     {
@@ -51,6 +58,8 @@ public class PlayerController : NetworkBehaviour, IDamageable
 
         HandleMovementInput();
 
+        Aim();
+
         for (int i = 0; i < items.Length; i++)
         {
             if (Input.GetKeyDown((i + 1).ToString()))
@@ -60,7 +69,7 @@ public class PlayerController : NetworkBehaviour, IDamageable
             }
         }
 
-        if (Input.GetMouseButtonDown(0))
+        if (Input.GetMouseButton(0))
         {
             items[itemIndex].Use();
         }
@@ -68,6 +77,11 @@ public class PlayerController : NetworkBehaviour, IDamageable
         if (Input.GetKeyDown(KeyCode.K))
         {
             Die();
+        }
+
+        if (Input.GetKeyDown(KeyCode.T))
+        {
+            Test();
         }
     }
 
@@ -186,6 +200,23 @@ public class PlayerController : NetworkBehaviour, IDamageable
         }
     }
 
+    private void Aim()
+    {
+        if (Input.GetMouseButton(1))
+            isAiming = true;
+        else
+            isAiming = false;
+
+        if (isAiming)
+        {
+            weaponRoot.position = Vector3.Lerp(weaponRoot.position, adsPosition.position, Time.deltaTime * aimSpeed);
+        }
+        else
+        {
+            weaponRoot.position = Vector3.Lerp(weaponRoot.position, owPosition.position, Time.deltaTime * aimSpeed);
+        }
+    }
+
     public void TakeDamage(float damage)
     {
         Debug.Log("Took damage: " + damage); // Ïðàöþº
@@ -211,5 +242,11 @@ public class PlayerController : NetworkBehaviour, IDamageable
     public void Resurrect()
     {
         isAlive = true;
+    }
+
+    private void Test()
+    {
+        rigBuilder.enabled = false;
+        rigBuilder.enabled = true;
     }
 }
