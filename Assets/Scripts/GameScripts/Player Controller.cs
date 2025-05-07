@@ -32,6 +32,8 @@ public class PlayerController : NetworkBehaviour, IDamageable
     private bool isAlive = true;
     private bool isAiming;
 
+    private TickRunner networkTickRunner = new TickRunner();
+
     private void Start()
     {
         if (!IsOwner)
@@ -118,7 +120,7 @@ public class PlayerController : NetworkBehaviour, IDamageable
     [ServerRpc]
     private void UpdateRotationServerRpc(Quaternion newRotation)
     {
-        UpdateRotationClientRpc(newRotation);
+        networkTickRunner.Tick(() => UpdateRotationClientRpc(newRotation), Time.deltaTime);
     }
 
     [ClientRpc]
@@ -142,7 +144,7 @@ public class PlayerController : NetworkBehaviour, IDamageable
     [ServerRpc(RequireOwnership = false)]
     private void EquipItemServerRpc(int _index)
     {
-        EquipItemClientRpc(_index);
+        networkTickRunner.Tick(() => EquipItemClientRpc(_index), Time.deltaTime);
     }
 
     [ClientRpc]
@@ -165,18 +167,12 @@ public class PlayerController : NetworkBehaviour, IDamageable
     [ServerRpc(RequireOwnership = false)]
     private void HandleMovementServerRpc(Vector3 moveDir)
     {
-        moveAmount = Vector3.SmoothDamp(moveAmount, moveDir * (Input.GetKey(KeyCode.LeftShift) ? sprintSpeed : walkSpeed), ref smoothMoveVelocity, smoothTime);
-
-        UpdateAnimationClientRpc(moveDir.magnitude);
-    }
-
-    [ClientRpc]
-    private void UpdatePositionClientRpc(Vector3 newPosition)
-    {
-        if (!IsOwner)
+        networkTickRunner.Tick(() =>
         {
-            transform.position = newPosition;
-        }
+            moveAmount = Vector3.SmoothDamp(moveAmount, moveDir * (Input.GetKey(KeyCode.LeftShift) ? sprintSpeed : walkSpeed), ref smoothMoveVelocity, smoothTime);
+
+            UpdateAnimationClientRpc(moveDir.magnitude);
+        }, Time.deltaTime);
     }
 
     [ClientRpc]
@@ -190,13 +186,25 @@ public class PlayerController : NetworkBehaviour, IDamageable
 
     private void FixedUpdate()
     {
-        if (IsServer)
+        networkTickRunner.Tick(() =>
         {
-            Vector3 newPosition = rb.position + transform.TransformDirection(moveAmount) * Time.fixedDeltaTime;
+                if (IsServer)
+                {
+                    Vector3 newPosition = rb.position + transform.TransformDirection(moveAmount) * Time.fixedDeltaTime;
 
-            rb.MovePosition(newPosition);
+                    rb.MovePosition(newPosition);
 
-            UpdatePositionClientRpc(newPosition);
+                    UpdatePositionClientRpc(newPosition);
+                }
+        }, Time.deltaTime);
+    }
+
+    [ClientRpc]
+    private void UpdatePositionClientRpc(Vector3 newPosition)
+    {
+        if (!IsOwner)
+        {
+            transform.position = newPosition;
         }
     }
 
