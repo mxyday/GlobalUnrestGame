@@ -1247,12 +1247,12 @@ GameObject:
   - component: {fileID: 4133288699555313568}
   - component: {fileID: 2811375841286782208}
   m_Layer: 0
-  m_Name: Rifle
+  m_Name: RifleModel
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &8840505219868869166
 Transform:
   m_ObjectHideFlags: 0
@@ -1592,7 +1592,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &4620866354544120100
 Transform:
   m_ObjectHideFlags: 0
@@ -1625,7 +1625,7 @@ MonoBehaviour:
   ItemGameObject: {fileID: 104626865662110588}
   weaponHolder: {fileID: 590671488424392559}
   shootPoint: {fileID: 6355253699357841993}
-  fireDelay: 50
+  fireDelay: 0.1
   hitEffectPrefab: {fileID: 2856241766972156004, guid: 3b8512c5364f1e74492db375abf6050c, type: 3}
   networkHitEffect: {fileID: 1174121865493774620}
   recoilForce: 0.1
@@ -3364,6 +3364,7 @@ MonoBehaviour:
   smoothTime: 0.01
   items:
   - {fileID: 5559577386156199829}
+  - {fileID: 628922034477644656}
 --- !u!114 &2600532243639073768
 MonoBehaviour:
   m_ObjectHideFlags: 0

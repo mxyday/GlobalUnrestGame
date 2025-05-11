@@ -64,7 +64,7 @@ public class PlayerController : NetworkBehaviour, IDamageable
 
         for (int i = 0; i < items.Length; i++)
         {
-            if (Input.GetKeyDown((i + 1).ToString()))
+            if (Input.GetKeyDown(KeyCode.Alpha1 + i))
             {
                 EquipItem(i);
                 break;
