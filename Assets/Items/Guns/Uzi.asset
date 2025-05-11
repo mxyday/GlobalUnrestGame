@@ -13,4 +13,4 @@ MonoBehaviour:
   m_Name: Uzi
   m_EditorClassIdentifier: 
   itemName: Uzi
-  damage: 35
+  damage: 25
