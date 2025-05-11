@@ -211,18 +211,15 @@ public class PlayerController : NetworkBehaviour, IDamageable
     private void Aim()
     {
         if (Input.GetMouseButton(1))
+        {
             isAiming = true;
+            Debug.Log("Aiming");
+        }
         else
             isAiming = false;
 
-        if (isAiming)
-        {
-            weaponRoot.position = Vector3.Lerp(weaponRoot.position, adsPosition.position, Time.deltaTime * aimSpeed);
-        }
-        else
-        {
-            weaponRoot.position = Vector3.Lerp(weaponRoot.position, owPosition.position, Time.deltaTime * aimSpeed);
-        }
+        Vector3 targetPos = isAiming ? adsPosition.position : owPosition.position;
+        weaponRoot.position = Vector3.Lerp(weaponRoot.position, targetPos, Time.deltaTime * aimSpeed);
     }
 
     public void TakeDamage(float damage)
