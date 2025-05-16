@@ -3434,9 +3434,12 @@ MonoBehaviour:
   walkSpeed: 3
   jumpForce: 1
   smoothTime: 0.01
-  items:
-  - {fileID: 628922034477644656}
-  - {fileID: 2198574837736049269}
+  availableLoadouts:
+  - {fileID: 11400000, guid: 1b38520bd54b9b34bb970f35fdcc51a1, type: 2}
+  - {fileID: 11400000, guid: d149c2813a78c7d4aa844a070b7c8023, type: 2}
+  allItems:
+  - {fileID: 8421068681780891088}
+  - {fileID: 2915036046820437179}
 --- !u!114 &2600532243639073768
 MonoBehaviour:
   m_ObjectHideFlags: 0

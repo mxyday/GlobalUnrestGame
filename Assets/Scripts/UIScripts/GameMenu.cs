@@ -6,19 +6,27 @@ public class GameMenu : MonoBehaviour
 {
     public static GameMenu Instance { get; private set; }
 
-    [SerializeField] private Button aTeamButton;
-    [SerializeField] private Button bTeamButton;
     [SerializeField] private Button resumeButton;
     [SerializeField] private Button mainMenuButton;
     [SerializeField] private Button quitButton;
     [SerializeField] private Button changeTeamButton;
-    [SerializeField] private Button changeWeaponButton;
+    [SerializeField] private Button changeClassButton;
     [SerializeField] private Button respawnButton;
+
+    [SerializeField] private Button aTeamButton;
+    [SerializeField] private Button bTeamButton;
+
+    [SerializeField] private Button RiflemanButton;
+    [SerializeField] private Button ScoutButton;
+    [SerializeField] private Button MachinegunnerButton;
+    [SerializeField] private Button BreacherButton;
+
     [SerializeField] private GameObject gameMenu;
     [SerializeField] private GameObject teamSelectMenu;
-    [SerializeField] private GameObject weaponSelectMenu;
+    [SerializeField] private GameObject classSelectMenu;
 
     private PlayerSettings localPlayerSettings;
+    private PlayerController playerController;
 
     PlayerSettings playerSettings;
 
@@ -34,6 +42,7 @@ public class GameMenu : MonoBehaviour
             if (settings != null && settings.IsOwner)
             {
                 playerSettings = settings;
+                playerController = player.GetComponent<PlayerController>();
                 break;
             }
         }
@@ -59,9 +68,10 @@ public class GameMenu : MonoBehaviour
             teamSelectMenu.SetActive(true);
         });
 
-        changeWeaponButton.onClick.AddListener(() =>
+        changeClassButton.onClick.AddListener(() =>
         {
-
+            gameMenu.SetActive(false);
+            classSelectMenu.SetActive(true);
         });
 
         respawnButton.onClick.AddListener(() =>
@@ -94,6 +104,34 @@ public class GameMenu : MonoBehaviour
         {
             Application.Quit();
         });
+
+        RiflemanButton.onClick.AddListener(() =>
+        {
+            playerController.SetClass(0);
+            playerSettings.Respawn();
+            ClassSelectMenuDeactivate();
+        });
+
+        ScoutButton.onClick.AddListener(() =>
+        {
+            playerController.SetClass(3);
+            playerSettings.Respawn();
+            ClassSelectMenuDeactivate();
+        });
+
+        MachinegunnerButton.onClick.AddListener(() =>
+        {
+            playerController.SetClass(2);
+            playerSettings.Respawn();
+            ClassSelectMenuDeactivate();
+        });
+
+        BreacherButton.onClick.AddListener(() =>
+        {
+            playerController.SetClass(1);
+            playerSettings.Respawn();
+            ClassSelectMenuDeactivate();
+        });
     }
 
     private void Update()
@@ -125,5 +163,12 @@ public class GameMenu : MonoBehaviour
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
         teamSelectMenu.SetActive(false);
+    }
+
+    private void ClassSelectMenuDeactivate()
+    {
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
+        classSelectMenu.SetActive(false);
     }
 }

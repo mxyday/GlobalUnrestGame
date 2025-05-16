@@ -2,6 +2,7 @@ using Unity.Netcode;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Animations.Rigging;
+using System.Linq;
 
 public class PlayerController : NetworkBehaviour, IDamageable
 {
@@ -15,7 +16,11 @@ public class PlayerController : NetworkBehaviour, IDamageable
 
     [SerializeField] float mouseSensitivity, sprintSpeed, walkSpeed, jumpForce, smoothTime;
 
-    [SerializeField] Item[] items;
+    [SerializeField] private WeaponLoadout[] availableLoadouts;
+    [SerializeField] private GameObject[] allItems;
+    private Item[] items;
+
+    private GameObject currentWeapon;
 
     float health = 100;
     int itemIndex;
@@ -41,6 +46,9 @@ public class PlayerController : NetworkBehaviour, IDamageable
             aimTransform.SetActive(false);
             cameraObject.SetActive(false);
         }
+
+        SetClass(0);
+        EquipItem(0);
     }
 
     private void Awake()
@@ -71,7 +79,7 @@ public class PlayerController : NetworkBehaviour, IDamageable
             }
         }
 
-        if (Input.GetMouseButton(0))
+        if (Input.GetMouseButton(0) && items != null)
         {
             items[itemIndex].Use();
         }
@@ -253,5 +261,40 @@ public class PlayerController : NetworkBehaviour, IDamageable
     {
         rigBuilder.enabled = false;
         rigBuilder.enabled = true;
+    }
+
+    public void SetClass(int classIndex)
+    {
+        if (classIndex < 0 || classIndex >= availableLoadouts.Length) return;
+
+        // Вимикаємо всю зброю
+        foreach (var item in allItems)
+        {
+            item.SetActive(false);
+        }
+
+        var loadout = availableLoadouts[classIndex];
+
+        // Активуємо лише ті, що входять у набір
+        foreach (var classitem in loadout.classItems)
+        {
+            var item = allItems.FirstOrDefault(w => w.name == classitem);
+            if (item != null)
+            {
+                item.SetActive(true);
+            }
+            else
+            {
+                Debug.LogWarning($"Weapon '{classitem}' not found in allItems list!");
+            }
+        }
+
+        // Оновлюємо список активних предметів для перемикання
+        items = allItems
+            .Where(w => w.activeSelf && w.TryGetComponent<Item>(out _))
+            .Select(w => w.GetComponent<Item>())
+            .ToArray();
+
+        EquipItem(0); // Автоматично екіпувати першу зброю
     }
 }
