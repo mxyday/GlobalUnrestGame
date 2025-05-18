@@ -1,7 +1,6 @@
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;
-using UnityEditor.Animations;
 using UnityEngine;
 
 public class MapArea : MonoBehaviour
@@ -41,6 +40,7 @@ public class MapArea : MonoBehaviour
     private void MapAreaCollider_OnPlayerEnter(object sender, EventArgs e)
     {
         OnPlayerEnter?.Invoke(this, EventArgs.Empty);
+        Debug.Log("Player entered area");
     }
 
     private void MapAreaCollider_OnPlayerExit(object sender, EventArgs e)
@@ -70,7 +70,7 @@ public class MapArea : MonoBehaviour
                     Debug.Log("Team A captured the point");
                 }
 
-                break; 
+                break;
             case State.TeamA:
                 break;
         }

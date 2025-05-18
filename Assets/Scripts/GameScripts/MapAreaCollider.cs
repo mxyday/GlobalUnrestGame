@@ -1,6 +1,5 @@
-using NUnit.Framework;
-using System;
 using System.Collections.Generic;
+using System;
 using UnityEngine;
 
 public class MapAreaCollider : MonoBehaviour
@@ -15,6 +14,7 @@ public class MapAreaCollider : MonoBehaviour
         {
             playerMapAreasList.Add(playerMapAreas);
             OnPlayerEnter?.Invoke(this, EventArgs.Empty);
+            Debug.Log("Trigger entered");
         }
     }
 
