@@ -37,15 +37,15 @@ public class MapArea : MonoBehaviour
         state = State.Neutral;
     }
 
-    private void MapAreaCollider_OnPlayerEnter(object sender, EventArgs e)
+    private void MapAreaCollider_OnPlayerEnter(object sender, PlayerMapAreasEventArgs e)
     {
-        OnPlayerEnter?.Invoke(this, EventArgs.Empty);
+        OnPlayerEnter?.Invoke(this, e);
         Debug.Log("Player entered area");
     }
 
-    private void MapAreaCollider_OnPlayerExit(object sender, EventArgs e)
+    private void MapAreaCollider_OnPlayerExit(object sender, PlayerMapAreasEventArgs e)
     {
-        OnPlayerExit?.Invoke(this, EventArgs.Empty);
+        OnPlayerExit?.Invoke(this, e);
     }
 
     private void Update()

@@ -4,26 +4,32 @@ using UnityEngine;
 
 public class MapAreaCollider : MonoBehaviour
 {
-    public event EventHandler OnPlayerEnter;
-    public event EventHandler OnPlayerExit;
+    public event EventHandler<PlayerMapAreasEventArgs> OnPlayerEnter;
+    public event EventHandler<PlayerMapAreasEventArgs> OnPlayerExit;
 
     private List<PlayerMapAreas> playerMapAreasList = new List<PlayerMapAreas>();
+
     private void OnTriggerEnter(Collider collider)
     {
-        if (collider.TryGetComponent<PlayerMapAreas>(out PlayerMapAreas playerMapAreas) != null)
+        if (collider.TryGetComponent<PlayerMapAreas>(out PlayerMapAreas playerMapAreas))
         {
             playerMapAreasList.Add(playerMapAreas);
-            OnPlayerEnter?.Invoke(this, EventArgs.Empty);
-            Debug.Log("Trigger entered");
+            Debug.Log($"[MapAreaCollider] Player entered: {playerMapAreas.gameObject.name}");
+            OnPlayerEnter?.Invoke(this, new PlayerMapAreasEventArgs(playerMapAreas));
+        }
+        else
+        {
+            Debug.Log($"[MapAreaCollider] Object entered but has no PlayerMapAreas: {collider.gameObject.name}");
         }
     }
 
     private void OnTriggerExit(Collider collider)
     {
-        if (collider.TryGetComponent<PlayerMapAreas>(out PlayerMapAreas playerMapAreas) != null)
+        if (collider.TryGetComponent<PlayerMapAreas>(out PlayerMapAreas playerMapAreas))
         {
             playerMapAreasList.Remove(playerMapAreas);
-            OnPlayerExit?.Invoke(this, EventArgs.Empty);
+            OnPlayerExit?.Invoke(this, new PlayerMapAreasEventArgs(playerMapAreas));
+
         }
     }
 

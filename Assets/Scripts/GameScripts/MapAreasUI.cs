@@ -1,4 +1,5 @@
 using NUnit.Framework;
+using System;
 using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
@@ -35,15 +36,29 @@ public class MapAreasUI : MonoBehaviour
         }
     }
 
-    private void MapArea_OnPlayerEnter(object sender, System.EventArgs e)
+    private void MapArea_OnPlayerEnter(object sender, EventArgs e)
     {
-        mapArea = sender as MapArea;
-        Show();
+        if (e is PlayerMapAreasEventArgs args)
+        {
+            var settings = args.PlayerMapAreas.GetComponent<PlayerSettings>();
+            if (settings != null && settings.IsOwner)
+            {
+                mapArea = sender as MapArea;
+                Show();
+            }
+        }
     }
 
-    private void MapArea_OnPlayerExit(object sender, System.EventArgs e)
+    private void MapArea_OnPlayerExit(object sender, EventArgs e)
     {
-        Hide();
+        if (e is PlayerMapAreasEventArgs args)
+        {
+            var settings = args.PlayerMapAreas.GetComponent<PlayerSettings>();
+            if (settings != null && settings.IsOwner)
+            {
+                Hide();
+            }
+        }
     }
 
     private void Show()
