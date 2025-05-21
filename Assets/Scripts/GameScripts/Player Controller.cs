@@ -25,6 +25,9 @@ public class PlayerController : NetworkBehaviour, IDamageable
     [SerializeField] private float aimFOV = 40f;
     [SerializeField] private float fovSpeed = 10f;
 
+    [SerializeField] private float rotationSmoothSpeed = 10f;
+    private Quaternion targetRotation;
+
     private float targetFOV;
 
     private GameObject currentWeapon;
@@ -63,6 +66,7 @@ public class PlayerController : NetworkBehaviour, IDamageable
         animator = GetComponent<Animator>();
         rb = GetComponent<Rigidbody>();
         EquipItem(-1);
+
     }
 
     private void Update()
@@ -76,6 +80,11 @@ public class PlayerController : NetworkBehaviour, IDamageable
         HandleMovementInput();
 
         Aim();
+
+        if (!IsOwner)
+        {
+            transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.deltaTime * rotationSmoothSpeed);
+        }
 
         for (int i = 0; i < items.Length; i++)
         {
@@ -143,7 +152,7 @@ public class PlayerController : NetworkBehaviour, IDamageable
     {
         if (!IsOwner)
         {
-            transform.rotation = newRotation;
+            targetRotation = newRotation;
         }
     }
 
