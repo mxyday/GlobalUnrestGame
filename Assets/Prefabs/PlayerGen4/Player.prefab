@@ -586,11 +586,11 @@ MonoBehaviour:
   fireDelay: 0.1
   hitEffectPrefab: {fileID: 2856241766972156004, guid: 3b8512c5364f1e74492db375abf6050c, type: 3}
   networkHitEffect: {fileID: 1174121865493774620}
-  recoilRotationAmount: 3
+  recoilRotationAmount: 5
   recoilRecoverySpeed: 10
   recoilPivot: {fileID: 9209811802976075346}
   recoilPivotOffset: {x: 0, y: -0.2, z: 0}
-  jumpForce: 0.1
+  jumpForce: 0.02
   maxJumpOffset: 0.1
   jumpRecoverySpeed: 5
   kickbackAmount: 0.05
@@ -1607,7 +1607,7 @@ Transform:
   m_GameObject: {fileID: 8353731818827327425}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: -0.025, z: -0.116}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1700,7 +1700,7 @@ Transform:
   m_GameObject: {fileID: 8676051549994513342}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: -0.018, z: -0.212}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -3428,6 +3428,7 @@ MonoBehaviour:
   rigBuilder: {fileID: 4490318952016076923}
   aimTransform: {fileID: 2552126026339071939}
   cameraObject: {fileID: 4653955284353702482}
+  playerCamera: {fileID: 5525144795607807206}
   adsPosition: {fileID: 5591179196416115764}
   owPosition: {fileID: 7130677721416903163}
   weaponRoot: {fileID: 583728889182927476}
@@ -3443,6 +3444,9 @@ MonoBehaviour:
   allItems:
   - {fileID: 8421068681780891088}
   - {fileID: 2915036046820437179}
+  defaultFOV: 60
+  aimFOV: 40
+  fovSpeed: 10
 --- !u!114 &2600532243639073768
 MonoBehaviour:
   m_ObjectHideFlags: 0

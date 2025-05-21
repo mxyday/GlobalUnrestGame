@@ -53,14 +53,6 @@ public class PlayerSettings : NetworkBehaviour
         SetSpawnPoints(SpawnPointManager.Instance.spawnPoints);
     }
 
-    /// <summary>
-    /// Викликається зовні для встановлення списку спавн-поінтів
-    /// </summary>
-    //public void SetSpawnPoints(List<GameObject> points)
-    //{
-    //    spawnPoints = points;
-    //}
-
     private void UpdateTeam(int teamIndex)
     {
         if (teamIndex >= 0 && teamIndex < colors.Count)
@@ -119,5 +111,10 @@ public class PlayerSettings : NetworkBehaviour
     {
         spawnPoints = points;
         UpdateTeam(ownerTeamId.Value); // одразу оновимо спавн
+    }
+
+    public int GetTeamIndex()
+    {
+        return ownerTeamId.Value;
     }
 }

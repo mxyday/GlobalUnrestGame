@@ -95,9 +95,6 @@ public class SingleShotGun : Gun
     private void Shoot()
     {
         Debug.Log("Shoot fired");
-        ApplyRecoil();
-        ApplyJump(jumpForce);
-        ApplyKickback();
 
         Ray ray = new Ray(shootPoint.position, shootPoint.forward);
         if (Physics.Raycast(ray, out RaycastHit hit))
@@ -112,6 +109,10 @@ public class SingleShotGun : Gun
             if (hit.collider.TryGetComponent<NetworkObject>(out var targetNetworkObject))
                 ApplyDamageServerRpc(targetNetworkObject, ((GunInfo)ItemInfo).damage);
         }
+
+        ApplyRecoil();
+        ApplyJump(jumpForce);
+        ApplyKickback();
     }
 
     private void ApplyRecoil()

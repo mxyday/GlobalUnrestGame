@@ -9,6 +9,7 @@ public class PlayerController : NetworkBehaviour, IDamageable
     [SerializeField] RigBuilder rigBuilder;
     [SerializeField] GameObject aimTransform;
     [SerializeField] GameObject cameraObject;
+    [SerializeField] private Camera playerCamera;
     [SerializeField] private Transform adsPosition;
     [SerializeField] private Transform owPosition;
     [SerializeField] private Transform weaponRoot;
@@ -19,6 +20,12 @@ public class PlayerController : NetworkBehaviour, IDamageable
     [SerializeField] private WeaponLoadout[] availableLoadouts;
     [SerializeField] private GameObject[] allItems;
     private Item[] items;
+
+    [SerializeField] private float defaultFOV = 60f;
+    [SerializeField] private float aimFOV = 40f;
+    [SerializeField] private float fovSpeed = 10f;
+
+    private float targetFOV;
 
     private GameObject currentWeapon;
 
@@ -228,6 +235,9 @@ public class PlayerController : NetworkBehaviour, IDamageable
 
         Vector3 targetPos = isAiming ? adsPosition.position : owPosition.position;
         weaponRoot.position = Vector3.Lerp(weaponRoot.position, targetPos, Time.deltaTime * aimSpeed);
+
+        float targetFOV = isAiming ? aimFOV : defaultFOV;
+        playerCamera.fieldOfView = Mathf.Lerp(playerCamera.fieldOfView, targetFOV, Time.deltaTime * fovSpeed);
     }
 
     public void TakeDamage(float damage)

@@ -9,6 +9,9 @@ public class MapAreasUI : MonoBehaviour
 {
     [SerializeField] private List<MapArea> mapAreaList;
 
+    [SerializeField] private Slider ATeamSlider;
+    [SerializeField] private Slider BTeamSlider;
+
     private MapArea mapArea;
     private Slider mapAreaProgress;
 
@@ -30,10 +33,12 @@ public class MapAreasUI : MonoBehaviour
 
     private void Update()
     {
-        if (mapArea != null)
-        {
-            mapAreaProgress.value = mapArea.GetProgress();
-        }
+        if (mapArea == null) return;
+
+        float progress = mapArea.GetCaptureProgress(); // від -1 до 1
+
+        ATeamSlider.value = progress > 0 ? progress : 0f;
+        BTeamSlider.value = progress < 0 ? -progress : 0f;
     }
 
     private void MapArea_OnPlayerEnter(object sender, EventArgs e)

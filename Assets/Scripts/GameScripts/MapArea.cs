@@ -8,6 +8,9 @@ public class MapArea : MonoBehaviour
     public event EventHandler OnPlayerEnter;
     public event EventHandler OnPlayerExit;
 
+    private float captureProgress = 0f; // -1 (TeamB), 0 (neutral), 1 (TeamA)
+    private const float captureSpeed = 0.25f; // швидкість зміни за секунду
+
     public enum State
     {
         Neutral,
@@ -16,7 +19,7 @@ public class MapArea : MonoBehaviour
     }
 
     private List<MapAreaCollider> mapAreaColliderList;
-    private float progress;
+    //private float progress;
     private State state;
 
     private void Awake()
@@ -50,34 +53,36 @@ public class MapArea : MonoBehaviour
 
     private void Update()
     {
-        switch (state)
+        int teamACount = 0;
+        int teamBCount = 0;
+
+        foreach (MapAreaCollider mapAreaCollider in mapAreaColliderList)
         {
-            case State.Neutral:
-                int playerCountInsideMapArea = 0;
-                foreach (MapAreaCollider mapAreaCollider in mapAreaColliderList)
-                {
-                    playerCountInsideMapArea += mapAreaCollider.GetPlayerMapAreasList().Count;
-                }
+            foreach (var player in mapAreaCollider.GetPlayerMapAreasList())
+            {
+                int teamIndex = player.GetComponent<PlayerSettings>().GetTeamIndex();
+                if (teamIndex == 0) teamACount++;
+                else if (teamIndex == 1) teamBCount++;
+            }
+        }
 
-                float progressSpeed = 0.02f;
-                progress += playerCountInsideMapArea * progressSpeed * Time.deltaTime;
+        int netTeamInfluence = teamACount - teamBCount;
+        float targetChange = netTeamInfluence * captureSpeed * Time.deltaTime;
 
-                Debug.Log("Progress: " + progress);
-
-                if (progress >= 1f)
-                {
-                    state = State.TeamA;
-                    Debug.Log("Team A captured the point");
-                }
-
-                break;
-            case State.TeamA:
-                break;
+        if ((netTeamInfluence > 0 && captureProgress < 1f) ||
+            (netTeamInfluence < 0 && captureProgress > -1f))
+        {
+            captureProgress = Mathf.Clamp(captureProgress + targetChange, -1f, 1f);
         }
     }
 
     public float GetProgress()
     {
-        return progress;
+        return captureProgress;
+    }
+
+    public float GetCaptureProgress()
+    {
+        return captureProgress;
     }
 }
