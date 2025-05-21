@@ -66,7 +66,6 @@ public class PlayerController : NetworkBehaviour, IDamageable
         animator = GetComponent<Animator>();
         rb = GetComponent<Rigidbody>();
         EquipItem(-1);
-
     }
 
     private void Update()
@@ -81,7 +80,7 @@ public class PlayerController : NetworkBehaviour, IDamageable
 
         Aim();
 
-        if (!IsOwner)
+        if (!IsServer && !IsOwner)
         {
             transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.deltaTime * rotationSmoothSpeed);
         }
@@ -212,14 +211,17 @@ public class PlayerController : NetworkBehaviour, IDamageable
     {
         networkTickRunner.Tick(() =>
         {
-                if (IsServer)
-                {
-                    Vector3 newPosition = rb.position + transform.TransformDirection(moveAmount) * Time.fixedDeltaTime;
+            if (IsServer)
+            {
+                // нмнбкч╙лн наепрюммъ оепед псунл
+                transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.deltaTime * rotationSmoothSpeed);
 
-                    rb.MovePosition(newPosition);
+                Vector3 newPosition = rb.position + transform.TransformDirection(moveAmount) * Time.fixedDeltaTime;
 
-                    UpdatePositionClientRpc(newPosition);
-                }
+                rb.MovePosition(newPosition);
+
+                UpdatePositionClientRpc(newPosition);
+            }
         }, Time.deltaTime);
     }
 
