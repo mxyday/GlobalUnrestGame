@@ -1,4 +1,3 @@
-using System.Globalization;
 using Unity.Netcode;
 using UnityEngine;
 
@@ -17,23 +16,14 @@ public class RagdollActivator : NetworkBehaviour
 
     public void ActivateRagdoll()
     {
-        animator.enabled = false;
-
-        if (mainCollider != null) mainCollider.enabled = false;
-        if (mainRigidbody != null) mainRigidbody.isKinematic = true;
-
         SetRagdollState(true);
         ActivateRagdollServerRpc();
     }
 
     public void DeactivateRagdoll()
     {
-        animator.enabled = true;
-
-        if (mainCollider != null) mainCollider.enabled = true;
-        if (mainRigidbody != null) mainRigidbody.isKinematic = false;
-
         SetRagdollState(false);
+        DeactivateRagdollServerRpc();
     }
 
     [ServerRpc(RequireOwnership = false)]
@@ -42,17 +32,33 @@ public class RagdollActivator : NetworkBehaviour
         ActivateRagdollClientRpc();
     }
 
+    [ServerRpc(RequireOwnership = false)]
+    private void DeactivateRagdollServerRpc()
+    {
+        DeactivateRagdollClientRpc();
+    }
+
     [ClientRpc]
     private void ActivateRagdollClientRpc()
     {
-        if (!IsOwner) // Власник уже активував локально
+        if (!IsOwner)
         {
             SetRagdollState(true);
         }
     }
 
+    [ClientRpc]
+    private void DeactivateRagdollClientRpc()
+    {
+        if (!IsOwner)
+        {
+            SetRagdollState(false);
+        }
+    }
+
     private void SetRagdollState(bool state)
     {
+        // Ragdoll частини
         foreach (var rb in ragdollBodies)
         {
             rb.isKinematic = !state;
@@ -62,5 +68,15 @@ public class RagdollActivator : NetworkBehaviour
         {
             col.enabled = state;
         }
+
+        // Головні компоненти
+        if (animator != null)
+            animator.enabled = !state;
+
+        if (mainCollider != null)
+            mainCollider.enabled = !state;
+
+        if (mainRigidbody != null)
+            mainRigidbody.isKinematic = state;
     }
 }
