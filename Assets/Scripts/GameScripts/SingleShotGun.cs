@@ -1,9 +1,22 @@
 using UnityEngine;
 using Unity.Netcode;
+using UnityEngine.UI;
+using System.Collections;
+using TMPro;
 
 public class SingleShotGun : Gun
 {
     [SerializeField] private Transform weaponHolder;
+
+    [Header("Ammo Settings")]
+    [SerializeField] private int ammoCapacity;
+    private int magazineCapacity;
+    private int originalAmmoCapacity;
+    private int originalMagazineCapacity;
+    private TextMeshProUGUI magazineUI;
+    private TextMeshProUGUI ammoUI;
+    [SerializeField] private float reloadTime;
+    private bool isReloading = false;
 
     [Header("Shooting Settings")]
     [SerializeField] private Transform shootPoint;
@@ -44,6 +57,13 @@ public class SingleShotGun : Gun
 
     private float lastShotTime;
 
+    private PlayerAnimatorHandler animatorHandler;
+
+    public void Initialize(PlayerAnimatorHandler handler)
+    {
+        animatorHandler = handler;
+    }
+
     private void Start()
     {
         if (networkHitEffect == null)
@@ -53,10 +73,41 @@ public class SingleShotGun : Gun
         originalPosition = weaponHolder.localPosition;
         originalRotation = transform.localRotation;
         originalPivotPosition = recoilPivot != null ? recoilPivot.localPosition : Vector3.zero;
+
+        StartCoroutine(DelayedUISetup());
+
+        magazineCapacity = ((GunInfo)ItemInfo).magazineSize;
+
+        originalAmmoCapacity = ammoCapacity;
+        originalMagazineCapacity = magazineCapacity;
     }
+
+    private IEnumerator DelayedUISetup()
+    {
+        yield return new WaitUntil(() => GameObject.FindGameObjectWithTag("MagazineUI") != null);
+        yield return new WaitUntil(() => GameObject.FindGameObjectWithTag("AmmoUI") != null);
+
+        GameObject objByTag = GameObject.FindGameObjectWithTag("MagazineUI");
+        magazineUI = objByTag.GetComponent<TextMeshProUGUI>();
+
+        GameObject objByTag1 = GameObject.FindGameObjectWithTag("AmmoUI");
+        ammoUI = objByTag1.GetComponent<TextMeshProUGUI>();
+
+        if (magazineUI != null)
+            magazineUI.text = magazineCapacity.ToString();
+        else
+            Debug.LogError("MagazineCapacity object found, but no TextMeshProUGUI component attached.");
+        if (ammoUI != null)
+            ammoUI.text = ammoCapacity.ToString();
+        else
+            Debug.LogError("AmmoCapacity object found, but no TextMeshProUGUI component attached.");
+    }
+
 
     public override void Use()
     {
+        if (isReloading) return;
+
         if (Time.time - lastShotTime >= fireDelay)
         {
             Shoot();
@@ -94,9 +145,22 @@ public class SingleShotGun : Gun
 
     private void Shoot()
     {
+        if (magazineCapacity <= 0)
+        {
+            if (ammoCapacity > 0 && !isReloading)
+            {
+                Reload();
+            }
+            return;
+        }
         Debug.Log("Shoot fired");
 
         Ray ray = new Ray(shootPoint.position, shootPoint.forward);
+
+        magazineCapacity -= 1;
+        if (magazineUI != null)
+            magazineUI.text = magazineCapacity.ToString();
+
         if (Physics.Raycast(ray, out RaycastHit hit))
         {
             Debug.Log("Shoot hit");
@@ -113,6 +177,39 @@ public class SingleShotGun : Gun
         ApplyRecoil();
         ApplyJump(jumpForce);
         ApplyKickback();
+    }
+
+    private void Reload()
+    {
+        if (isReloading || magazineCapacity == ((GunInfo)ItemInfo).magazineSize || ammoCapacity <= 0)
+            return;
+
+        StartCoroutine(ReloadRoutine());
+    }
+
+    private IEnumerator ReloadRoutine()
+    {
+        isReloading = true;
+        Debug.Log("Reloading...");
+
+        // ¬икликаЇмо ан≥мац≥ю:
+        animatorHandler?.PlayReload();
+
+        yield return new WaitForSeconds(reloadTime);
+
+        int maxMag = ((GunInfo)ItemInfo).magazineSize;
+        int neededAmmo = maxMag - magazineCapacity;
+        int ammoToReload = Mathf.Min(neededAmmo, ammoCapacity);
+
+        magazineCapacity += ammoToReload;
+        ammoCapacity -= ammoToReload;
+
+        if (magazineUI != null)
+            magazineUI.text = magazineCapacity.ToString();
+        if (ammoUI != null)
+            ammoUI.text = ammoCapacity.ToString();
+
+        isReloading = false;
     }
 
     private void ApplyRecoil()
@@ -157,5 +254,16 @@ public class SingleShotGun : Gun
     {
         if (targetRef.TryGet(out NetworkObject target))
             target.GetComponent<IDamageable>()?.TakeDamage(damage);
+    }
+
+    public void RestoreAmmo()
+    {
+        magazineCapacity = originalMagazineCapacity;
+        ammoCapacity = originalAmmoCapacity;
+
+        if (magazineUI != null)
+            magazineUI.text = magazineCapacity.ToString();
+        if (ammoUI != null)
+            ammoUI.text = ammoCapacity.ToString();
     }
 }

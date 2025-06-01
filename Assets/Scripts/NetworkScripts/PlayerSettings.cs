@@ -23,9 +23,12 @@ public class PlayerSettings : NetworkBehaviour
     private NetworkVariable<int> ownerTeamId = new NetworkVariable<int>(
         0, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
 
+    public List<SingleShotGun> playerWeapons = new List<SingleShotGun>();
+
     private void Awake()
     {
         skinnedMeshRenderer = GetComponentInChildren<SkinnedMeshRenderer>();
+        playerWeapons = new List<SingleShotGun>(GetComponentsInChildren<SingleShotGun>());
     }
 
     public override void OnNetworkSpawn()
@@ -99,6 +102,12 @@ public class PlayerSettings : NetworkBehaviour
             if (ragdollActivator != null)
             {
                 ragdollActivator.DeactivateRagdoll();
+            }
+
+            foreach (SingleShotGun weapon in playerWeapons)
+            {
+                weapon.RestoreAmmo();
+                Debug.Log($"Restored ammo for {weapon}");
             }
         }
         else

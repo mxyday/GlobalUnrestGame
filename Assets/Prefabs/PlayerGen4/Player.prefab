@@ -616,6 +616,8 @@ MonoBehaviour:
   ItemInfo: {fileID: 11400000, guid: 79314b4a26c6d074383dfa10c9c4cc99, type: 2}
   ItemGameObject: {fileID: 492336729033698836}
   weaponHolder: {fileID: 590671488424392559}
+  ammoCapacity: 60
+  reloadTime: 2
   shootPoint: {fileID: 3022633146129668209}
   fireDelay: 0.1
   hitEffectPrefab: {fileID: 2856241766972156004, guid: 3b8512c5364f1e74492db375abf6050c, type: 3}
@@ -1695,6 +1697,8 @@ MonoBehaviour:
   ItemInfo: {fileID: 11400000, guid: c54ff3eb48960cd45a7fcd75471c840f, type: 2}
   ItemGameObject: {fileID: 104626865662110588}
   weaponHolder: {fileID: 590671488424392559}
+  ammoCapacity: 135
+  reloadTime: 2
   shootPoint: {fileID: 6355253699357841993}
   fireDelay: 0.1
   hitEffectPrefab: {fileID: 2856241766972156004, guid: 3b8512c5364f1e74492db375abf6050c, type: 3}
@@ -2039,6 +2043,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 0868c1c33214b4b489ebebcaa528e27d, type: 3}
       insertIndex: -1
       addedObject: {fileID: 5342251267231296819}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 0868c1c33214b4b489ebebcaa528e27d, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 5331103678922106245}
     - targetCorrespondingSourceObject: {fileID: 1082271958561512970, guid: 0868c1c33214b4b489ebebcaa528e27d, type: 3}
       insertIndex: -1
       addedObject: {fileID: 7257017512487561326}
@@ -3628,6 +3635,9 @@ MonoBehaviour:
   - {r: 0, g: 1, b: 0.91636705, a: 0}
   - {r: 1, g: 0.68167484, b: 0, a: 0}
   spawnPoint: {fileID: 0}
+  playerWeapons:
+  - {fileID: 2198574837736049269}
+  - {fileID: 628922034477644656}
 --- !u!114 &4490318952016076923
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3755,6 +3765,18 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ShowTopMostFoldoutHeaderGroup: 1
+--- !u!114 &5331103678922106245
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8970435124480229204}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1e8fe9df994bf45459a850c60b76269e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &9203398835818552335 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 1082271958561512970, guid: 0868c1c33214b4b489ebebcaa528e27d, type: 3}
