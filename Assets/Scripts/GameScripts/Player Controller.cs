@@ -99,6 +99,14 @@ public class PlayerController : NetworkBehaviour, IDamageable
             items[itemIndex].Use();
         }
 
+        if (Input.GetKeyDown(KeyCode.R) && items != null)
+        {
+            if (items[itemIndex] is Gun gun)
+            {
+                gun.Reload();
+            }
+        }
+
         if (Input.GetKeyDown(KeyCode.K))
         {
             Die();

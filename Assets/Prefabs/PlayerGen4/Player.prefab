@@ -618,6 +618,7 @@ MonoBehaviour:
   weaponHolder: {fileID: 590671488424392559}
   ammoCapacity: 60
   reloadTime: 2
+  animatorHandler: {fileID: 5331103678922106245}
   shootPoint: {fileID: 3022633146129668209}
   fireDelay: 0.1
   hitEffectPrefab: {fileID: 2856241766972156004, guid: 3b8512c5364f1e74492db375abf6050c, type: 3}
@@ -1699,6 +1700,7 @@ MonoBehaviour:
   weaponHolder: {fileID: 590671488424392559}
   ammoCapacity: 135
   reloadTime: 2
+  animatorHandler: {fileID: 5331103678922106245}
   shootPoint: {fileID: 6355253699357841993}
   fireDelay: 0.1
   hitEffectPrefab: {fileID: 2856241766972156004, guid: 3b8512c5364f1e74492db375abf6050c, type: 3}
@@ -3499,7 +3501,21 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ShowTopMostFoldoutHeaderGroup: 1
-  TransitionStateInfoList: []
+  TransitionStateInfoList:
+  - IsCrossFadeExit: 0
+    Layer: 0
+    OriginatingState: 2081823275
+    DestinationState: -391498677
+    TransitionDuration: 0.1
+    TriggerNameHash: -1525363869
+    TransitionIndex: 1
+  - IsCrossFadeExit: 0
+    Layer: 0
+    OriginatingState: -2086507823
+    DestinationState: -391498677
+    TransitionDuration: 0.1
+    TriggerNameHash: -1525363869
+    TransitionIndex: 1
   m_Animator: {fileID: 2438311414156836756}
 --- !u!114 &-7941438195406398003
 MonoBehaviour:
@@ -3777,6 +3793,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1e8fe9df994bf45459a850c60b76269e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  animator: {fileID: 2438311414156836756}
+  leftHandConstraint: {fileID: 5405846820334256719}
 --- !u!1 &9203398835818552335 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 1082271958561512970, guid: 0868c1c33214b4b489ebebcaa528e27d, type: 3}

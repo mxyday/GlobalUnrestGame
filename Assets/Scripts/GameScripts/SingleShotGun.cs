@@ -17,6 +17,7 @@ public class SingleShotGun : Gun
     private TextMeshProUGUI ammoUI;
     [SerializeField] private float reloadTime;
     private bool isReloading = false;
+    [SerializeField] private PlayerAnimatorHandler animatorHandler;
 
     [Header("Shooting Settings")]
     [SerializeField] private Transform shootPoint;
@@ -56,13 +57,6 @@ public class SingleShotGun : Gun
     private Vector3 targetKickbackOffset = Vector3.zero;
 
     private float lastShotTime;
-
-    private PlayerAnimatorHandler animatorHandler;
-
-    public void Initialize(PlayerAnimatorHandler handler)
-    {
-        animatorHandler = handler;
-    }
 
     private void Start()
     {
@@ -179,7 +173,7 @@ public class SingleShotGun : Gun
         ApplyKickback();
     }
 
-    private void Reload()
+    public override void Reload()
     {
         if (isReloading || magazineCapacity == ((GunInfo)ItemInfo).magazineSize || ammoCapacity <= 0)
             return;
@@ -192,8 +186,8 @@ public class SingleShotGun : Gun
         isReloading = true;
         Debug.Log("Reloading...");
 
-        // ¬икликаЇмо ан≥мац≥ю:
-        animatorHandler?.PlayReload();
+        animatorHandler?.SetReloading(true);
+        animatorHandler?.SetReloadAnimationSpeed(reloadTime);
 
         yield return new WaitForSeconds(reloadTime);
 
@@ -210,6 +204,7 @@ public class SingleShotGun : Gun
             ammoUI.text = ammoCapacity.ToString();
 
         isReloading = false;
+        animatorHandler?.SetReloading(false); // ¬имикаЇмо бул
     }
 
     private void ApplyRecoil()
