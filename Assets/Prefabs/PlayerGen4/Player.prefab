@@ -623,12 +623,12 @@ MonoBehaviour:
   fireDelay: 0.1
   hitEffectPrefab: {fileID: 2856241766972156004, guid: 3b8512c5364f1e74492db375abf6050c, type: 3}
   networkHitEffect: {fileID: 1174121865493774620}
-  recoilRotationAmount: 5
+  recoilRotationAmount: 1
   recoilRecoverySpeed: 10
   recoilPivot: {fileID: 9209811802976075346}
   recoilPivotOffset: {x: 0, y: -0.2, z: 0}
-  jumpForce: 0.02
-  maxJumpOffset: 0.1
+  jumpForce: 0.005
+  maxJumpOffset: 0.05
   jumpRecoverySpeed: 5
   kickbackAmount: 0.05
   kickbackSpeed: 25
@@ -754,7 +754,6 @@ Transform:
   - {fileID: 355274856062468279}
   - {fileID: 1598784213381683146}
   - {fileID: 6431880112268129637}
-  - {fileID: 2598506595384471624}
   - {fileID: 1532086956129517393}
   - {fileID: 4224357791938299209}
   - {fileID: 169500170867204044}
@@ -1533,92 +1532,6 @@ MonoBehaviour:
   m_hasFontAssetChanged: 0
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
---- !u!1 &8191266531728726636
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 2598506595384471624}
-  - component: {fileID: 4125288905542990438}
-  m_Layer: 0
-  m_Name: AimWeapon
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 0
---- !u!4 &2598506595384471624
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8191266531728726636}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 5797365963072746426}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &4125288905542990438
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8191266531728726636}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e3c430f382484144e925c097c2d33cfe, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_Weight: 1
-  m_Data:
-    m_ConstrainedObject: {fileID: 590671488424392559}
-    m_SourceObjects:
-      m_Length: 1
-      m_Item0:
-        transform: {fileID: 1532086956129517393}
-        weight: 1
-      m_Item1:
-        transform: {fileID: 0}
-        weight: 0
-      m_Item2:
-        transform: {fileID: 0}
-        weight: 0
-      m_Item3:
-        transform: {fileID: 0}
-        weight: 0
-      m_Item4:
-        transform: {fileID: 0}
-        weight: 0
-      m_Item5:
-        transform: {fileID: 0}
-        weight: 0
-      m_Item6:
-        transform: {fileID: 0}
-        weight: 0
-      m_Item7:
-        transform: {fileID: 0}
-        weight: 0
-    m_Offset: {x: 0, y: 0, z: 0}
-    m_MinLimit: -180
-    m_MaxLimit: 180
-    m_AimAxis: 4
-    m_UpAxis: 2
-    m_WorldUpType: 0
-    m_WorldUpObject: {fileID: 0}
-    m_WorldUpAxis: 2
-    m_MaintainOffset: 0
-    m_ConstrainedAxes:
-      x: 1
-      y: 1
-      z: 1
 --- !u!1 &8353731818827327425
 GameObject:
   m_ObjectHideFlags: 0
@@ -1963,6 +1876,10 @@ PrefabInstance:
       propertyPath: m_Controller
       value: 
       objectReference: {fileID: 9100000, guid: c8a69cef0ebe7534e8ec1e6e42391152, type: 2}
+    - target: {fileID: 5866666021909216657, guid: 0868c1c33214b4b489ebebcaa528e27d, type: 3}
+      propertyPath: m_UpdateMode
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 5866666021909216657, guid: 0868c1c33214b4b489ebebcaa528e27d, type: 3}
       propertyPath: m_CullingMode
       value: 0
@@ -3501,21 +3418,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ShowTopMostFoldoutHeaderGroup: 1
-  TransitionStateInfoList:
-  - IsCrossFadeExit: 0
-    Layer: 0
-    OriginatingState: 2081823275
-    DestinationState: -391498677
-    TransitionDuration: 0.1
-    TriggerNameHash: -1525363869
-    TransitionIndex: 1
-  - IsCrossFadeExit: 0
-    Layer: 0
-    OriginatingState: -2086507823
-    DestinationState: -391498677
-    TransitionDuration: 0.1
-    TriggerNameHash: -1525363869
-    TransitionIndex: 1
+  TransitionStateInfoList: []
   m_Animator: {fileID: 2438311414156836756}
 --- !u!114 &-7941438195406398003
 MonoBehaviour:
@@ -3702,9 +3605,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   headBone: {fileID: 2403270100688959341}
   stabilizedTransform: {fileID: 1660961114743893612}
-  smoothSpeed: 10
-  maxOffsetDistance: 0.5
-  yawSmoothSpeed: 10
+  smoothSpeed: 14
+  maxOffsetDistance: 0.05
+  yawSmoothSpeed: 14
   stabilizeYaw: 1
 --- !u!114 &1998378483495392854
 MonoBehaviour:
@@ -3793,6 +3696,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1e8fe9df994bf45459a850c60b76269e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  ShowTopMostFoldoutHeaderGroup: 1
   animator: {fileID: 2438311414156836756}
   leftHandConstraint: {fileID: 5405846820334256719}
 --- !u!1 &9203398835818552335 stripped

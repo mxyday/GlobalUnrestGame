@@ -140,11 +140,11 @@ public class GameLobby : MonoBehaviour
     {
         try
         {
-            JoinAllocation joinAllocation = await RelayService.Instance.JoinAllocationAsync(joinCode);
-            return joinAllocation;
-        } catch (RelayServiceException e)
+            return await RelayService.Instance.JoinAllocationAsync(joinCode);
+        }
+        catch (RelayServiceException e)
         {
-            Debug.Log(e);
+            Debug.LogError($"Relay join failed: {e}");
             return default;
         }
     }
@@ -153,35 +153,57 @@ public class GameLobby : MonoBehaviour
     {
         try
         {
+            Debug.Log("Creating lobby...");
+
             joinedLobby = await LobbyService.Instance.CreateLobbyAsync(lobbyName, GameMultiplayer.MAX_PLAYER_AMOUNT, new CreateLobbyOptions
             {
                 IsPrivate = isPrivate
             });
+            Debug.Log("Created lobby: " + joinedLobby.Name);
 
             Allocation allocation = await AllocateRelay();
+            if (allocation == null)
+            {
+                Debug.LogError("Allocation failed");
+                return;
+            }
 
             string relayJoinCode = await GetRelayJoinCode(allocation);
+            if (string.IsNullOrEmpty(relayJoinCode))
+            {
+                Debug.LogError("Failed to get relay join code");
+                return;
+            }
+            Debug.Log("Got relay join code: " + relayJoinCode);
 
             await LobbyService.Instance.UpdateLobbyAsync(joinedLobby.Id, new UpdateLobbyOptions
             {
                 Data = new Dictionary<string, DataObject>
-                {
-                    {KEY_RELAY_JOIN_CODE, new DataObject(DataObject.VisibilityOptions.Member, relayJoinCode) }
-                }
+            {
+                {KEY_RELAY_JOIN_CODE, new DataObject(DataObject.VisibilityOptions.Member, relayJoinCode) }
+            }
             });
 
-            NetworkManager.Singleton.GetComponent<UnityTransport>().SetHostRelayData(
-            allocation.RelayServer.IpV4,
-            (ushort)allocation.RelayServer.Port,
-            allocation.AllocationIdBytes,
-            allocation.Key,
-            allocation.ConnectionData);
+            var transport = NetworkManager.Singleton.GetComponent<UnityTransport>();
+            transport.SetHostRelayData(
+                allocation.RelayServer.IpV4,
+                (ushort)allocation.RelayServer.Port,
+                allocation.AllocationIdBytes,
+                allocation.Key,
+                allocation.ConnectionData
+            );
+            Debug.Log("Host relay data set");
 
             GameMultiplayer.Instance.StartHost();
             Loader.LoadNetwork(Loader.Scene.GameScene);
-        } catch (LobbyServiceException e) 
+        }
+        catch (LobbyServiceException e)
         {
-            Debug.Log(e);
+            Debug.LogError($"Lobby creation failed: {e}");
+        }
+        catch (Exception e)
+        {
+            Debug.LogError($"Unexpected error: {e}");
         }
     }
 
@@ -189,12 +211,33 @@ public class GameLobby : MonoBehaviour
     {
         try
         {
+            Debug.Log("Joining lobby with ID: " + lobbyId);
+
+            // Приєднуємось до лобі
             joinedLobby = await LobbyService.Instance.JoinLobbyByIdAsync(lobbyId);
+            Debug.Log("Joined lobby: " + joinedLobby.Name);
+
+            // Отримуємо Relay Join Code з даних лобі
+            if (!joinedLobby.Data.ContainsKey(KEY_RELAY_JOIN_CODE))
+            {
+                Debug.LogError("No Relay join code in lobby data");
+                return;
+            }
 
             string relayJoinCode = joinedLobby.Data[KEY_RELAY_JOIN_CODE].Value;
-            JoinAllocation joinAllocation = await JoinRelay(relayJoinCode);
+            Debug.Log("Relay join code: " + relayJoinCode);
 
-            NetworkManager.Singleton.GetComponent<UnityTransport>().SetClientRelayData(
+            // Приєднуємось до Relay
+            JoinAllocation joinAllocation = await JoinRelay(relayJoinCode);
+            if (joinAllocation == null)
+            {
+                Debug.LogError("Failed to join Relay");
+                return;
+            }
+
+            // Налаштовуємо клієнтські дані Relay
+            var transport = NetworkManager.Singleton.GetComponent<UnityTransport>();
+            transport.SetClientRelayData(
                 joinAllocation.RelayServer.IpV4,
                 (ushort)joinAllocation.RelayServer.Port,
                 joinAllocation.AllocationIdBytes,
@@ -202,12 +245,22 @@ public class GameLobby : MonoBehaviour
                 joinAllocation.ConnectionData,
                 joinAllocation.HostConnectionData
             );
+            Debug.Log("Relay server data set");
 
+            // Тепер можна запускати клієнта
             GameMultiplayer.Instance.StartClient();
         }
         catch (LobbyServiceException e)
         {
-            Debug.Log(e);
+            Debug.LogError($"Failed to join lobby: {e}");
+        }
+        catch (RelayServiceException e)
+        {
+            Debug.LogError($"Failed to join Relay: {e}");
+        }
+        catch (Exception e)
+        {
+            Debug.LogError($"Unexpected error: {e}");
         }
     }
 
@@ -215,11 +268,16 @@ public class GameLobby : MonoBehaviour
     {
         try
         {
+            // Швидке приєднання до лобі
             joinedLobby = await LobbyService.Instance.QuickJoinLobbyAsync();
 
+            // Отримуємо Relay Join Code
             string relayJoinCode = joinedLobby.Data[KEY_RELAY_JOIN_CODE].Value;
+
+            // Приєднуємось до Relay
             JoinAllocation joinAllocation = await JoinRelay(relayJoinCode);
 
+            // Налаштовуємо клієнтські дані Relay
             NetworkManager.Singleton.GetComponent<UnityTransport>().SetClientRelayData(
                 joinAllocation.RelayServer.IpV4,
                 (ushort)joinAllocation.RelayServer.Port,
@@ -229,11 +287,12 @@ public class GameLobby : MonoBehaviour
                 joinAllocation.HostConnectionData
             );
 
+            // Запускаємо клієнта
             GameMultiplayer.Instance.StartClient();
         }
         catch (LobbyServiceException e)
         {
-            Debug.Log(e);
+            Debug.LogError($"Quick join failed: {e}");
         }
     }
 

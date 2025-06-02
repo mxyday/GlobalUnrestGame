@@ -33,10 +33,19 @@ public class PlayerSettings : NetworkBehaviour
 
     public override void OnNetworkSpawn()
     {
-        networkPlayerName.Value = "Player: " + (OwnerClientId + 1);
+        if (IsOwner) // Тільки власник об'єкта ініціалізує ім'я
+        {
+            SetPlayerNameServerRpc("Player: " + (OwnerClientId + 1));
+        }
 
         if (playerName != null)
             playerName.text = networkPlayerName.Value.ToString();
+
+        // Підписка на зміни імені
+        networkPlayerName.OnValueChanged += (oldValue, newValue) =>
+        {
+            playerName.text = newValue.ToString();
+        };
 
         StartCoroutine(WaitForSpawnPointManager());
 
@@ -44,6 +53,12 @@ public class PlayerSettings : NetworkBehaviour
         {
             UpdateTeam(newValue);
         };
+    }
+
+    [ServerRpc]
+    private void SetPlayerNameServerRpc(FixedString128Bytes newName)
+    {
+        networkPlayerName.Value = newName;
     }
 
     private IEnumerator WaitForSpawnPointManager()

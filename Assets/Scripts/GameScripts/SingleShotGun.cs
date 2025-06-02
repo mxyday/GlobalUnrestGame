@@ -209,8 +209,8 @@ public class SingleShotGun : Gun
 
     private void ApplyRecoil()
     {
-        float randomX = Random.Range(-0.5f, 0.5f);
-        float randomY = Random.Range(0.8f, 1.2f);
+        float randomX = Random.Range(-2f, 2f);
+        float randomY = Random.Range(1.2f, 3f);
 
         Vector3 recoilRotation = new Vector3(
             -recoilRotationAmount * randomY,
