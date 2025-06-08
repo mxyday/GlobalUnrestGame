@@ -1174,12 +1174,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 192562dbefdc44640804d788b9108200, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  ShowTopMostFoldoutHeaderGroup: 1
   ItemInfo: {fileID: 11400000, guid: 79314b4a26c6d074383dfa10c9c4cc99, type: 2}
   ItemGameObject: {fileID: 770891126582664132}
   weaponHolder: {fileID: 6432286923359728143}
   ammoCapacity: 60
   reloadTime: 2
-  animatorHandler: {fileID: 0}
+  animatorHandler: {fileID: 3078087543306191937}
   shootPoint: {fileID: 30279373354877826}
   fireDelay: 0.1
   hitEffectPrefab: {fileID: 2856241766972156004, guid: 3b8512c5364f1e74492db375abf6050c, type: 3}
@@ -1239,12 +1240,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 192562dbefdc44640804d788b9108200, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  ShowTopMostFoldoutHeaderGroup: 1
   ItemInfo: {fileID: 11400000, guid: c54ff3eb48960cd45a7fcd75471c840f, type: 2}
   ItemGameObject: {fileID: 8368395861720837701}
   weaponHolder: {fileID: 6432286923359728143}
-  ammoCapacity: 135
+  ammoCapacity: 90
   reloadTime: 2
-  animatorHandler: {fileID: 0}
+  animatorHandler: {fileID: 3078087543306191937}
   shootPoint: {fileID: 30083976751459392}
   fireDelay: 0.1
   hitEffectPrefab: {fileID: 2856241766972156004, guid: 3b8512c5364f1e74492db375abf6050c, type: 3}
@@ -3172,7 +3174,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   GlobalObjectIdHash: 1967408697
-  InScenePlacedSourceGlobalObjectIdHash: 330458169
+  InScenePlacedSourceGlobalObjectIdHash: 1967408697
   DeferredDespawnTick: 0
   Ownership: 1
   AlwaysReplicateAsRoot: 0

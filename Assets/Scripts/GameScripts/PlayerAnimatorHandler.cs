@@ -53,7 +53,7 @@ public class PlayerAnimatorHandler : NetworkBehaviour
         {
             float targetWeight = isReloading ? 0f : 1f;
             leftHandConstraint.weight = targetWeight;
-
+            Debug.Log("Left hand IK changed value");
             if (IsOwner)
             {
                 leftHandWeight.Value = targetWeight;
