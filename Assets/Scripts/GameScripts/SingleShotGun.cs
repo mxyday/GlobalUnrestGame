@@ -165,7 +165,10 @@ public class SingleShotGun : Gun
                 Destroy(Instantiate(hitEffectPrefab, hit.point, Quaternion.LookRotation(hit.normal)), 2f);
 
             if (hit.collider.TryGetComponent<NetworkObject>(out var targetNetworkObject))
-                ApplyDamageServerRpc(targetNetworkObject, ((GunInfo)ItemInfo).damage);
+            {
+                var targetRef = new NetworkObjectReference(targetNetworkObject);
+                ApplyDamageServerRpc(targetRef, ((GunInfo)ItemInfo).damage);
+            }
         }
 
         ApplyRecoil();
@@ -244,11 +247,14 @@ public class SingleShotGun : Gun
         targetKickbackOffset = new Vector3(0f, 0f, -kickbackAmount);
     }
 
-    [ServerRpc]
+    [ServerRpc(RequireOwnership = false)]
     private void ApplyDamageServerRpc(NetworkObjectReference targetRef, float damage)
     {
         if (targetRef.TryGet(out NetworkObject target))
+        {
             target.GetComponent<IDamageable>()?.TakeDamage(damage);
+            Debug.Log("Shoot hit");
+        }
     }
 
     public void RestoreAmmo()

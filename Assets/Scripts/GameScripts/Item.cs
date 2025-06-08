@@ -1,6 +1,7 @@
+using Unity.Netcode;
 using UnityEngine;
 
-public abstract class Item : MonoBehaviour
+public abstract class Item : NetworkBehaviour
 {
     public ItemInfo ItemInfo;
     public GameObject ItemGameObject;
