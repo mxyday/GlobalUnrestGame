@@ -3365,9 +3365,9 @@ MonoBehaviour:
   playerName: {fileID: 951302140290055682}
   ragdollActivator: {fileID: 5242960526205343760}
   playerController: {fileID: 6904040807038033609}
-  colors:
-  - {r: 0, g: 1, b: 0.91636705, a: 0}
-  - {r: 1, g: 0.68167484, b: 0, a: 0}
+  teamMaterials:
+  - {fileID: 2100000, guid: 7465d554978baa1479fafdb857d1a86f, type: 2}
+  - {fileID: 2100000, guid: ef97491eefdf64b4496075dc23b90f41, type: 2}
   spawnPoint: {fileID: 0}
   playerWeapons:
   - {fileID: 1586111536456911796}

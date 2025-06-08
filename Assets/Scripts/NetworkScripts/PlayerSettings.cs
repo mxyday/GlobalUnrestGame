@@ -11,7 +11,7 @@ public class PlayerSettings : NetworkBehaviour
     [SerializeField] private TextMeshProUGUI playerName;
     [SerializeField] private RagdollActivator ragdollActivator;
     [SerializeField] private PlayerController playerController;
-    public List<Color> colors = new List<Color>();
+    public List<Material> teamMaterials = new List<Material>();
 
     public Transform spawnPoint;
 
@@ -73,11 +73,9 @@ public class PlayerSettings : NetworkBehaviour
 
     private void UpdateTeam(int teamIndex)
     {
-        if (teamIndex >= 0 && teamIndex < colors.Count)
+        if (teamIndex >= 0 && teamIndex < teamMaterials.Count && teamMaterials[teamIndex] != null)
         {
-            Material newMaterial = new Material(skinnedMeshRenderer.material);
-            newMaterial.color = colors[teamIndex];
-            skinnedMeshRenderer.material = newMaterial;
+            skinnedMeshRenderer.material = teamMaterials[teamIndex];
 
             if (spawnPoints != null && teamIndex < spawnPoints.Count && spawnPoints[teamIndex] != null)
             {
