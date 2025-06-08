@@ -1849,6 +1849,10 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: -2933139716659438605, guid: 0868c1c33214b4b489ebebcaa528e27d, type: 3}
+      propertyPath: m_Mesh
+      value: 
+      objectReference: {fileID: 3252224991405807402, guid: 0868c1c33214b4b489ebebcaa528e27d, type: 3}
+    - target: {fileID: -2933139716659438605, guid: 0868c1c33214b4b489ebebcaa528e27d, type: 3}
       propertyPath: 'm_Materials.Array.data[0]'
       value: 
       objectReference: {fileID: 2100000, guid: 451b79b23ae734042a9f15ca82fdb1db, type: 2}
@@ -1891,6 +1895,10 @@ PrefabInstance:
     - target: {fileID: 7985974569186381559, guid: 0868c1c33214b4b489ebebcaa528e27d, type: 3}
       propertyPath: m_Name
       value: PlayerModel
+      objectReference: {fileID: 0}
+    - target: {fileID: 7985974569186381559, guid: 0868c1c33214b4b489ebebcaa528e27d, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
