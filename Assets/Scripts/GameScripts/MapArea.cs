@@ -8,6 +8,9 @@ public class MapArea : MonoBehaviour
     public event EventHandler OnPlayerEnter;
     public event EventHandler OnPlayerExit;
 
+    [SerializeField] private MapAreaWorldUI worldUI;
+    [SerializeField] private string areaLetter = "A";
+
     private float captureProgress = 0f; // -1 (TeamB), 0 (neutral), 1 (TeamA)
     private const float captureSpeed = 0.25f; // швидкість зміни за секунду
 
@@ -21,6 +24,14 @@ public class MapArea : MonoBehaviour
     private List<MapAreaCollider> mapAreaColliderList;
     //private float progress;
     private State state;
+
+    void Start()
+    {
+        if (worldUI != null)
+        {
+            worldUI.SetLetter(areaLetter);
+        }
+    }
 
     private void Awake()
     {
@@ -73,6 +84,11 @@ public class MapArea : MonoBehaviour
             (netTeamInfluence < 0 && captureProgress > -1f))
         {
             captureProgress = Mathf.Clamp(captureProgress + targetChange, -1f, 1f);
+        }
+
+        if (worldUI != null)
+        {
+            worldUI.SetProgress(captureProgress);
         }
     }
 
