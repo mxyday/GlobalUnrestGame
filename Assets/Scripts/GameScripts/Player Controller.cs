@@ -16,6 +16,7 @@ public class PlayerController : NetworkBehaviour, IDamageable
     [SerializeField] private float aimSpeed = 10f;
 
     [SerializeField] float mouseSensitivity, sprintSpeed, walkSpeed, jumpForce, smoothTime;
+    [SerializeField] private float interpolationSpeed = 15f;
 
     [SerializeField] private WeaponLoadout[] availableLoadouts;
     [SerializeField] private GameObject[] allItems;
@@ -46,8 +47,13 @@ public class PlayerController : NetworkBehaviour, IDamageable
 
     private bool isAlive = true;
     private bool isAiming;
+    private bool isGrounded = true;
+
+    private bool canJump = true;
 
     private TickRunner networkTickRunner = new TickRunner();
+
+    private Vector3 targetPosition;
 
     private void Start()
     {
@@ -58,6 +64,14 @@ public class PlayerController : NetworkBehaviour, IDamageable
         }
 
         SetClass(0);
+        if (IsOwner)
+        {
+            Invoke(nameof(InitializeEquipment), 0.1f);
+        }
+    }
+
+    private void InitializeEquipment()
+    {
         EquipItem(0);
     }
 
@@ -79,11 +93,6 @@ public class PlayerController : NetworkBehaviour, IDamageable
         HandleMovementInput();
 
         Aim();
-
-        if (!IsServer && !IsOwner)
-        {
-            transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.deltaTime * rotationSmoothSpeed);
-        }
 
         for (int i = 0; i < items.Length; i++)
         {
@@ -107,22 +116,22 @@ public class PlayerController : NetworkBehaviour, IDamageable
             }
         }
 
+        if (Input.GetKeyDown(KeyCode.Space) && isGrounded)
+        {
+            Jump();
+        }
+
         if (Input.GetKeyDown(KeyCode.K))
         {
             Die();
-        }
-
-        if (Input.GetKeyDown(KeyCode.T))
-        {
-            Test();
         }
     }
 
     private void HandleMovementInput()
     {
         Vector3 moveDir = new Vector3(Input.GetAxisRaw("Horizontal"), 0, Input.GetAxisRaw("Vertical")).normalized;
-
-        HandleMovementServerRpc(moveDir.normalized);
+        bool isSprinting = Input.GetKey(KeyCode.LeftShift); // Передаємо стан спринту
+        HandleMovementServerRpc(moveDir, isSprinting);
     }
 
     private void Look()
@@ -146,7 +155,7 @@ public class PlayerController : NetworkBehaviour, IDamageable
     [ServerRpc]
     private void UpdateRotationServerRpc(Quaternion newRotation)
     {
-        networkTickRunner.Tick(() => UpdateRotationClientRpc(newRotation), Time.deltaTime);
+        networkTickRunner.Tick(() => UpdateRotationClientRpc(newRotation), Time.fixedDeltaTime);
     }
 
     [ClientRpc]
@@ -155,7 +164,7 @@ public class PlayerController : NetworkBehaviour, IDamageable
         if (!IsOwner)
         {
             targetRotation = newRotation;
-            transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.deltaTime * rotationSmoothSpeed);
+            transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.fixedDeltaTime * rotationSmoothSpeed);
         }
     }
 
@@ -171,13 +180,17 @@ public class PlayerController : NetworkBehaviour, IDamageable
     [ServerRpc(RequireOwnership = false)]
     private void EquipItemServerRpc(int _index)
     {
-        networkTickRunner.Tick(() => EquipItemClientRpc(_index), Time.deltaTime);
+        networkTickRunner.Tick(() => EquipItemClientRpc(_index), Time.fixedDeltaTime);
     }
 
     [ClientRpc]
     private void EquipItemClientRpc(int _index)
     {
-        if (_index == previousItemIndex) return;
+        if (_index == previousItemIndex || items == null || _index < 0 || _index >= items.Length)
+        {
+            Debug.LogWarning($"EquipItemClientRpc failed: index={_index}, items={(items == null ? "null" : items.Length.ToString())}");
+            return;
+        }
 
         itemIndex = _index;
 
@@ -191,15 +204,45 @@ public class PlayerController : NetworkBehaviour, IDamageable
         previousItemIndex = itemIndex;
     }
 
-    [ServerRpc(RequireOwnership = false)]
-    private void HandleMovementServerRpc(Vector3 moveDir)
+    private void Jump()
+    {
+        if (!IsOwner) return;
+
+        JumpServerRpc();
+    }
+
+    [ServerRpc]
+    private void JumpServerRpc()
     {
         networkTickRunner.Tick(() =>
         {
-            moveAmount = Vector3.SmoothDamp(moveAmount, moveDir * (Input.GetKey(KeyCode.LeftShift) ? sprintSpeed : walkSpeed), ref smoothMoveVelocity, smoothTime);
+            if (canJump)
+            {
+                rb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
+                isGrounded = false;
+                canJump = false;
 
-            UpdateAnimationClientRpc(moveDir.magnitude);
-        }, Time.deltaTime);
+            }
+        }, Time.fixedDeltaTime);
+    }
+
+    private void OnCollisionEnter(Collision collision)
+    {
+        isGrounded = true;
+        Invoke(nameof(ResetJump), 3f);
+    }
+
+    private void ResetJump()
+    {
+        canJump = true;
+    }
+
+    [ServerRpc]
+    private void HandleMovementServerRpc(Vector3 moveDir, bool isSprinting)
+    {
+        // Обчислюємо швидкість руху на сервері, використовуючи дані від клієнта
+        moveAmount = moveDir * (isSprinting ? sprintSpeed : walkSpeed);
+        UpdateAnimationClientRpc(moveDir.magnitude);
     }
 
     [ClientRpc]
@@ -217,15 +260,18 @@ public class PlayerController : NetworkBehaviour, IDamageable
         {
             if (IsServer)
             {
-                transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.deltaTime * rotationSmoothSpeed);
+                transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.fixedDeltaTime * rotationSmoothSpeed);
 
                 Vector3 newPosition = rb.position + transform.TransformDirection(moveAmount) * Time.fixedDeltaTime;
-
                 rb.MovePosition(newPosition);
 
                 UpdatePositionClientRpc(newPosition);
             }
-        }, Time.deltaTime);
+            else if (!IsOwner)
+            {
+                transform.position = Vector3.Lerp(transform.position, targetPosition, Time.fixedDeltaTime * interpolationSpeed);
+            }
+        }, Time.fixedDeltaTime);
     }
 
     [ClientRpc]
@@ -233,7 +279,7 @@ public class PlayerController : NetworkBehaviour, IDamageable
     {
         if (!IsOwner)
         {
-            transform.position = newPosition;
+            targetPosition = newPosition;
         }
     }
 
@@ -245,7 +291,9 @@ public class PlayerController : NetworkBehaviour, IDamageable
             Debug.Log("Aiming");
         }
         else
+        {
             isAiming = false;
+        }
 
         Vector3 targetPos = isAiming ? adsPosition.position : owPosition.position;
         weaponRoot.position = Vector3.Lerp(weaponRoot.position, targetPos, Time.deltaTime * aimSpeed);
@@ -256,7 +304,7 @@ public class PlayerController : NetworkBehaviour, IDamageable
 
     public void TakeDamage(float damage)
     {
-        Debug.Log("Took damage: " + damage); // Працює
+        Debug.Log($"Took damage: {damage}");
         health -= damage;
         if (health <= 0)
         {
@@ -279,12 +327,6 @@ public class PlayerController : NetworkBehaviour, IDamageable
     public void Resurrect()
     {
         isAlive = true;
-    }
-
-    private void Test()
-    {
-        rigBuilder.enabled = false;
-        rigBuilder.enabled = true;
     }
 
     public void SetClass(int classIndex)
@@ -316,6 +358,6 @@ public class PlayerController : NetworkBehaviour, IDamageable
             .Select(w => w.GetComponent<Item>())
             .ToArray();
 
-        EquipItem(0);
+        Debug.Log($"SetClass: items initialized with length={items.Length}");
     }
 }

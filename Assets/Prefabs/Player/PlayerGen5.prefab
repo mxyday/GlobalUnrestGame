@@ -3615,8 +3615,9 @@ MonoBehaviour:
   mouseSensitivity: 5
   sprintSpeed: 5
   walkSpeed: 2
-  jumpForce: 1
+  jumpForce: 5
   smoothTime: 0.01
+  interpolationSpeed: 10
   availableLoadouts:
   - {fileID: 11400000, guid: 1b38520bd54b9b34bb970f35fdcc51a1, type: 2}
   - {fileID: 11400000, guid: d149c2813a78c7d4aa844a070b7c8023, type: 2}
