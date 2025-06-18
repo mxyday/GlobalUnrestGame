@@ -132,19 +132,14 @@ public class PlayerController : NetworkBehaviour, IDamageable
             return;
         }
 
-        // Обертання гравця вліво/вправо по горизонталі (Yaw)
         transform.Rotate(Vector3.up * Input.GetAxisRaw("Mouse X") * mouseSensitivity);
 
-        // Обертання камери вгору/вниз по вертикалі (Pitch)
         verticalLookRotation += Input.GetAxisRaw("Mouse Y") * mouseSensitivity;
 
-        // Клэмпимо вертикальний кут у межах -75 до +75
         verticalLookRotation = Mathf.Clamp(verticalLookRotation, -75f, 75f);
 
-        // Обновляємо поворот aimTransform тільки по X осі (інверсія напряму)
         aimTransform.transform.localEulerAngles = new Vector3(-verticalLookRotation, 0f, 0f);
 
-        // Відправляємо оновлення на сервер
         UpdateRotationServerRpc(transform.rotation);
     }
 
@@ -222,7 +217,6 @@ public class PlayerController : NetworkBehaviour, IDamageable
         {
             if (IsServer)
             {
-                // ОНОВЛЮЄМО ОБЕРТАННЯ ПЕРЕД РУХОМ
                 transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.deltaTime * rotationSmoothSpeed);
 
                 Vector3 newPosition = rb.position + transform.TransformDirection(moveAmount) * Time.fixedDeltaTime;
@@ -297,7 +291,6 @@ public class PlayerController : NetworkBehaviour, IDamageable
     {
         if (classIndex < 0 || classIndex >= availableLoadouts.Length) return;
 
-        // Вимикаємо всю зброю
         foreach (var item in allItems)
         {
             item.SetActive(false);
@@ -305,7 +298,6 @@ public class PlayerController : NetworkBehaviour, IDamageable
 
         var loadout = availableLoadouts[classIndex];
 
-        // Активуємо лише ті, що входять у набір
         foreach (var classitem in loadout.classItems)
         {
             var item = allItems.FirstOrDefault(w => w.name == classitem);
@@ -319,12 +311,11 @@ public class PlayerController : NetworkBehaviour, IDamageable
             }
         }
 
-        // Оновлюємо список активних предметів для перемикання
         items = allItems
             .Where(w => w.activeSelf && w.TryGetComponent<Item>(out _))
             .Select(w => w.GetComponent<Item>())
             .ToArray();
 
-        EquipItem(0); // Автоматично екіпувати першу зброю
+        EquipItem(0);
     }
 }
