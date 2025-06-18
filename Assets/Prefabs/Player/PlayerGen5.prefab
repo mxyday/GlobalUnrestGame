@@ -1238,7 +1238,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &4109672310750670353
 Transform:
   m_ObjectHideFlags: 0
@@ -1335,7 +1335,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &2410522924272142194
 Transform:
   m_ObjectHideFlags: 0
@@ -1836,7 +1836,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &8058765335865955547
 Transform:
   m_ObjectHideFlags: 0
@@ -3782,7 +3782,9 @@ MonoBehaviour:
   spawnPoint: {fileID: 0}
   playerWeapons:
   - {fileID: 1586111536456911796}
-  - {fileID: 0}
+  - {fileID: 5913093737625944337}
+  - {fileID: 8528341528103645016}
+  - {fileID: 4090461848585193727}
 --- !u!114 &6084286929132840623
 MonoBehaviour:
   m_ObjectHideFlags: 0
