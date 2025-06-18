@@ -76,7 +76,7 @@ public class GameMenu : MonoBehaviour
 
         respawnButton.onClick.AddListener(() =>
         {
-            playerSettings.Respawn();
+            playerSettings.RequestRespawn();
             GameMenuDeactivate();
         });
 
@@ -108,28 +108,28 @@ public class GameMenu : MonoBehaviour
         RiflemanButton.onClick.AddListener(() =>
         {
             playerController.SetClass(0);
-            playerSettings.Respawn();
+            playerSettings.RequestRespawn();
             ClassSelectMenuDeactivate();
         });
 
         ScoutButton.onClick.AddListener(() =>
         {
             playerController.SetClass(3);
-            playerSettings.Respawn();
+            playerSettings.RequestRespawn();
             ClassSelectMenuDeactivate();
         });
 
         MachinegunnerButton.onClick.AddListener(() =>
         {
             playerController.SetClass(2);
-            playerSettings.Respawn();
+            playerSettings.RequestRespawn();
             ClassSelectMenuDeactivate();
         });
 
         BreacherButton.onClick.AddListener(() =>
         {
             playerController.SetClass(1);
-            playerSettings.Respawn();
+            playerSettings.RequestRespawn();
             ClassSelectMenuDeactivate();
         });
     }

@@ -160,6 +160,7 @@ public class PlayerController : NetworkBehaviour, IDamageable
         if (!IsOwner)
         {
             targetRotation = newRotation;
+            transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.deltaTime * rotationSmoothSpeed);
         }
     }
 

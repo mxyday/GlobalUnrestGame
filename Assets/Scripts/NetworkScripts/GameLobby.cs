@@ -154,7 +154,7 @@ public class GameLobby : MonoBehaviour
 
     public async void CreateLobby(string lobbyName, bool isPrivate)
     {
-        if (isCreatingLobby) return;
+        //if (isCreatingLobby) return;
         isCreatingLobby = true;
 
         try
@@ -220,7 +220,7 @@ public class GameLobby : MonoBehaviour
 
     public async Task<bool> JoinWithId(string lobbyId)
     {
-        if (isJoiningLobby) return false;
+        //if (isJoiningLobby) return false;
         isJoiningLobby = true;
 
         try
@@ -276,12 +276,12 @@ public class GameLobby : MonoBehaviour
             isJoiningLobby = false;
         }
 
-        return false; // додано, щоб задовольнити всі шляхи виконання
+        return false;
     }
 
     public async void QuickJoin()
     {
-        if (isJoiningLobby) return;
+        //if (isJoiningLobby) return;
         isJoiningLobby = true;
 
         try

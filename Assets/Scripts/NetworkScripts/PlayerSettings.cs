@@ -44,7 +44,8 @@ public class PlayerSettings : NetworkBehaviour
             yield return null;
 
         UpdateTeam(ownerTeamId.Value);
-        Respawn();
+        if (IsOwner)
+            RequestRespawn();
     }
 
     public override void OnNetworkSpawn()
@@ -109,6 +110,20 @@ public class PlayerSettings : NetworkBehaviour
 
         ownerTeamId.Value = teamIndex;
         UpdateTeam(teamIndex);
+        RequestRespawn();
+    }
+
+    public void RequestRespawn()
+    {
+        if (IsOwner)
+        {
+            RespawnRequestServerRpc();
+        }
+    }
+
+    [ServerRpc]
+    private void RespawnRequestServerRpc(ServerRpcParams rpcParams = default)
+    {
         Respawn();
     }
 
@@ -144,7 +159,8 @@ public class PlayerSettings : NetworkBehaviour
     {
         yield return new WaitForSeconds(0.5f);
         UpdateTeam(ownerTeamId.Value);
-        Respawn();
+        if (IsOwner)
+            RequestRespawn();
     }
 
     public void SetSpawnPoints(List<GameObject> points)

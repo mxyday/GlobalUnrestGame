@@ -68,12 +68,6 @@ public class LobbyUI : MonoBehaviour
         if (lobby.Players == null || lobby.Players.Count == 0)
             return false;
 
-        if (lobby.Data == null)
-            return false;
-
-        if (!lobby.Data.ContainsKey("RelayJoinCode") || string.IsNullOrEmpty(lobby.Data["RelayJoinCode"].Value))
-            return false;
-
         return true;
     }
 }
