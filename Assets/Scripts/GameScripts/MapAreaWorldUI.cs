@@ -6,26 +6,29 @@ using Unity.Netcode;
 
 public class MapAreaWorldUI : NetworkBehaviour
 {
-
     [SerializeField] private Image circleFillImage;
     [SerializeField] private TextMeshProUGUI letterText;
-    [SerializeField] private Transform lookTarget;
 
-    private Camera playerCamera;
+    private Transform cameraTransform;
+    private bool cameraAssigned = false;
+    private Vector3 initialScale;
 
-    private void Start()
+    private void Awake()
     {
-        if (!IsOwner) return;
-
-        // ¬изначити камеру гравц€ Ч може бути через тег або окремий клас
-        playerCamera = Camera.main;
+        initialScale = transform.localScale;
     }
 
-    private void Update()
+    private void LateUpdate()
     {
-        if (!IsOwner || playerCamera == null) return;
+        if (!cameraAssigned)
+        {
+            TryFindLocalCamera();
+        }
 
-        FaceCamera(playerCamera);
+        if (cameraTransform != null)
+        {
+            FaceCamera();
+        }
     }
 
     public void SetLetter(string letter)
@@ -38,11 +41,11 @@ public class MapAreaWorldUI : NetworkBehaviour
         circleFillImage.fillAmount = Mathf.Abs(progress);
 
         if (progress > 0)
-            circleFillImage.color = HexColor("#00FFF0"); // Team A Ч б≥рюзовий
+            circleFillImage.color = HexColor("#00FFF0");
         else if (progress < 0)
-            circleFillImage.color = HexColor("#FF9800"); // Team B Ч помаранчевий
+            circleFillImage.color = HexColor("#FF9800");
         else
-            circleFillImage.color = Color.gray; // нейтральний
+            circleFillImage.color = Color.gray;
     }
 
     private Color HexColor(string hex)
@@ -55,10 +58,36 @@ public class MapAreaWorldUI : NetworkBehaviour
         return Color.white;
     }
 
-    private void FaceCamera(Camera cam)
+    private void TryFindLocalCamera()
     {
-        Vector3 direction = cam.transform.position - lookTarget.position;
-        direction.y = 0f; // €кщо не хочеш, щоб крутивс€ по вертикал≥
-        lookTarget.forward = direction.normalized;
+        var players = FindObjectsByType<PlayerSettings>(FindObjectsSortMode.None);
+
+        foreach (PlayerSettings player in players)
+        {
+            if (player.IsOwner)
+            {
+                Camera foundCamera = player.GetComponentInChildren<Camera>();
+                if (foundCamera != null)
+                {
+                    cameraTransform = foundCamera.transform;
+                    cameraAssigned = true;
+                    break;
+                }
+            }
+        }
+    }
+
+    private void FaceCamera()
+    {
+        Vector3 direction = (cameraTransform.position - transform.position).normalized;
+        direction.y = 0f;
+
+        if (direction.sqrMagnitude > 0.001f)
+        {
+            Quaternion lookRotation = Quaternion.LookRotation(direction);
+            transform.rotation = lookRotation;
+        }
+
+        transform.localScale = initialScale;
     }
 }
