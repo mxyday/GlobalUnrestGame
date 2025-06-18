@@ -2,6 +2,7 @@ using Unity.Netcode;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Animations.Rigging;
+using System.Collections.Generic;
 using System.Linq;
 
 public class PlayerController : NetworkBehaviour, IDamageable
@@ -10,7 +11,7 @@ public class PlayerController : NetworkBehaviour, IDamageable
     [SerializeField] GameObject aimTransform;
     [SerializeField] GameObject cameraObject;
     [SerializeField] private Camera playerCamera;
-    [SerializeField] private Transform adsPosition;
+    [SerializeField] private List<Transform> adsPositions; // Список позицій ADS для кожної зброї
     [SerializeField] private Transform owPosition;
     [SerializeField] private Transform weaponRoot;
     [SerializeField] private float aimSpeed = 10f;
@@ -221,7 +222,6 @@ public class PlayerController : NetworkBehaviour, IDamageable
                 rb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
                 isGrounded = false;
                 canJump = false;
-
             }
         }, Time.fixedDeltaTime);
     }
@@ -295,7 +295,10 @@ public class PlayerController : NetworkBehaviour, IDamageable
             isAiming = false;
         }
 
-        Vector3 targetPos = isAiming ? adsPosition.position : owPosition.position;
+        // Отримуємо активну зброю і її ADS позицію
+        SingleShotGun weaponData = items[itemIndex].GetComponent<SingleShotGun>();
+        Transform currentAdsPosition = (weaponData != null) ? weaponData.ADSPosition : owPosition;
+        Vector3 targetPos = isAiming ? currentAdsPosition.position : owPosition.position;
         weaponRoot.position = Vector3.Lerp(weaponRoot.position, targetPos, Time.deltaTime * aimSpeed);
 
         float targetFOV = isAiming ? aimFOV : defaultFOV;
@@ -357,6 +360,12 @@ public class PlayerController : NetworkBehaviour, IDamageable
             .Where(w => w.activeSelf && w.TryGetComponent<Item>(out _))
             .Select(w => w.GetComponent<Item>())
             .ToArray();
+
+        // Перевірка відповідності кількості adsPositions і allItems
+        if (adsPositions != null && adsPositions.Count != allItems.Length)
+        {
+            Debug.LogWarning($"Number of adsPositions ({adsPositions.Count}) does not match number of allItems ({allItems.Length}). Ensure they are synchronized!");
+        }
 
         Debug.Log($"SetClass: items initialized with length={items.Length}");
     }

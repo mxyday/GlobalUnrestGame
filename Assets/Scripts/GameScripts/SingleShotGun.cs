@@ -8,6 +8,8 @@ public class SingleShotGun : Gun
 {
     [SerializeField] private Transform weaponHolder;
 
+    [SerializeField] public Transform ADSPosition;
+
     [Header("Ammo Settings")]
     [SerializeField] private int ammoCapacity;
     private int magazineCapacity;
