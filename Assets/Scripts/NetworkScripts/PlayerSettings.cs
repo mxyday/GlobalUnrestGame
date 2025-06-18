@@ -4,6 +4,7 @@ using TMPro;
 using Unity.Collections;
 using System.Collections.Generic;
 using System.Collections;
+using Unity.Netcode.Components;
 
 public class PlayerSettings : NetworkBehaviour
 {
@@ -31,6 +32,21 @@ public class PlayerSettings : NetworkBehaviour
         playerWeapons = new List<SingleShotGun>(GetComponentsInChildren<SingleShotGun>());
     }
 
+    private IEnumerator InitializePlayer()
+    {
+        while (SpawnPointManager.Instance == null)
+            yield return null;
+
+        SetSpawnPoints(SpawnPointManager.Instance.spawnPoints);
+
+        // Чекаємо, поки команда буде встановлена
+        while (ownerTeamId.Value == 0 && !IsServer) // або -1, якщо 0 допустима команда
+            yield return null;
+
+        UpdateTeam(ownerTeamId.Value);
+        Respawn();
+    }
+
     public override void OnNetworkSpawn()
     {
         if (IsOwner) // Тільки власник об'єкта ініціалізує ім'я
@@ -47,7 +63,7 @@ public class PlayerSettings : NetworkBehaviour
             playerName.text = newValue.ToString();
         };
 
-        StartCoroutine(WaitForSpawnPointManager());
+        StartCoroutine(InitializePlayer());
 
         ownerTeamId.OnValueChanged += (oldValue, newValue) =>
         {
@@ -61,17 +77,7 @@ public class PlayerSettings : NetworkBehaviour
         networkPlayerName.Value = newName;
     }
 
-    private IEnumerator WaitForSpawnPointManager()
-    {
-        while (SpawnPointManager.Instance == null)
-        {
-            yield return null;
-        }
-
-        SetSpawnPoints(SpawnPointManager.Instance.spawnPoints);
-    }
-
-    private void UpdateTeam(int teamIndex)
+    private bool UpdateTeam(int teamIndex)
     {
         if (teamIndex >= 0 && teamIndex < teamMaterials.Count && teamMaterials[teamIndex] != null)
         {
@@ -80,12 +86,14 @@ public class PlayerSettings : NetworkBehaviour
             if (spawnPoints != null && teamIndex < spawnPoints.Count && spawnPoints[teamIndex] != null)
             {
                 spawnPoint = spawnPoints[teamIndex].transform;
+                return true;
             }
             else
             {
                 Debug.LogWarning("Spawn point for team not assigned or out of range.");
             }
         }
+        return false;
     }
 
     public void RequestChangeTeam(int teamIndex)
@@ -108,14 +116,16 @@ public class PlayerSettings : NetworkBehaviour
     {
         if (spawnPoint != null)
         {
-            transform.SetPositionAndRotation(spawnPoint.position, spawnPoint.rotation);
+            var netTransform = GetComponent<NetworkTransform>();
+            if (netTransform != null)
+            {
+                netTransform.Teleport(spawnPoint.position, spawnPoint.rotation, transform.localScale);
+            }
 
             playerController.Resurrect();
 
             if (ragdollActivator != null)
-            {
                 ragdollActivator.DeactivateRagdoll();
-            }
 
             foreach (SingleShotGun weapon in playerWeapons)
             {
@@ -125,8 +135,16 @@ public class PlayerSettings : NetworkBehaviour
         }
         else
         {
-            Debug.LogWarning("No valid spawn point set.");
+            Debug.LogWarning("No valid spawn point set. Retrying...");
+            StartCoroutine(RetryRespawn());
         }
+    }
+
+    private IEnumerator RetryRespawn()
+    {
+        yield return new WaitForSeconds(0.5f);
+        UpdateTeam(ownerTeamId.Value);
+        Respawn();
     }
 
     public void SetSpawnPoints(List<GameObject> points)

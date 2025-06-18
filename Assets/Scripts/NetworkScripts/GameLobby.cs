@@ -29,6 +29,9 @@ public class GameLobby : MonoBehaviour
     private float heartbeatTimer;
     private float listLobbiesTimer;
 
+    private bool isCreatingLobby = false;
+    private bool isJoiningLobby = false;
+
     private void Awake()
     {
         Instance = this;
@@ -151,6 +154,9 @@ public class GameLobby : MonoBehaviour
 
     public async void CreateLobby(string lobbyName, bool isPrivate)
     {
+        if (isCreatingLobby) return;
+        isCreatingLobby = true;
+
         try
         {
             Debug.Log("Creating lobby...");
@@ -205,37 +211,40 @@ public class GameLobby : MonoBehaviour
         {
             Debug.LogError($"Unexpected error: {e}");
         }
+
+        finally
+        {
+            isCreatingLobby = false;
+        }
     }
 
-    public async void JoinWithId(string lobbyId)
+    public async Task<bool> JoinWithId(string lobbyId)
     {
+        if (isJoiningLobby) return false;
+        isJoiningLobby = true;
+
         try
         {
             Debug.Log("Joining lobby with ID: " + lobbyId);
 
-            // Приєднуємось до лобі
             joinedLobby = await LobbyService.Instance.JoinLobbyByIdAsync(lobbyId);
             Debug.Log("Joined lobby: " + joinedLobby.Name);
 
-            // Отримуємо Relay Join Code з даних лобі
             if (!joinedLobby.Data.ContainsKey(KEY_RELAY_JOIN_CODE))
             {
                 Debug.LogError("No Relay join code in lobby data");
-                return;
+                return false;
             }
 
             string relayJoinCode = joinedLobby.Data[KEY_RELAY_JOIN_CODE].Value;
-            Debug.Log("Relay join code: " + relayJoinCode);
 
-            // Приєднуємось до Relay
             JoinAllocation joinAllocation = await JoinRelay(relayJoinCode);
             if (joinAllocation == null)
             {
                 Debug.LogError("Failed to join Relay");
-                return;
+                return false;
             }
 
-            // Налаштовуємо клієнтські дані Relay
             var transport = NetworkManager.Singleton.GetComponent<UnityTransport>();
             transport.SetClientRelayData(
                 joinAllocation.RelayServer.IpV4,
@@ -245,10 +254,10 @@ public class GameLobby : MonoBehaviour
                 joinAllocation.ConnectionData,
                 joinAllocation.HostConnectionData
             );
-            Debug.Log("Relay server data set");
 
-            // Тепер можна запускати клієнта
             GameMultiplayer.Instance.StartClient();
+
+            return true;
         }
         catch (LobbyServiceException e)
         {
@@ -262,22 +271,27 @@ public class GameLobby : MonoBehaviour
         {
             Debug.LogError($"Unexpected error: {e}");
         }
+        finally
+        {
+            isJoiningLobby = false;
+        }
+
+        return false; // додано, щоб задовольнити всі шляхи виконання
     }
 
     public async void QuickJoin()
     {
+        if (isJoiningLobby) return;
+        isJoiningLobby = true;
+
         try
         {
-            // Швидке приєднання до лобі
             joinedLobby = await LobbyService.Instance.QuickJoinLobbyAsync();
 
-            // Отримуємо Relay Join Code
             string relayJoinCode = joinedLobby.Data[KEY_RELAY_JOIN_CODE].Value;
 
-            // Приєднуємось до Relay
             JoinAllocation joinAllocation = await JoinRelay(relayJoinCode);
 
-            // Налаштовуємо клієнтські дані Relay
             NetworkManager.Singleton.GetComponent<UnityTransport>().SetClientRelayData(
                 joinAllocation.RelayServer.IpV4,
                 (ushort)joinAllocation.RelayServer.Port,
@@ -287,12 +301,15 @@ public class GameLobby : MonoBehaviour
                 joinAllocation.HostConnectionData
             );
 
-            // Запускаємо клієнта
             GameMultiplayer.Instance.StartClient();
         }
         catch (LobbyServiceException e)
         {
             Debug.LogError($"Quick join failed: {e}");
+        }
+        finally
+        {
+            isJoiningLobby = false;
         }
     }
 

@@ -52,9 +52,28 @@ public class LobbyUI : MonoBehaviour
 
         foreach (Lobby lobby in lobbyList)
         {
+            if (!IsLobbyActive(lobby)) continue;
+
             Transform lobbyTransform = Instantiate(lobbyTemplate, lobbyContainer);
             lobbyTransform.gameObject.SetActive(true);
             lobbyTransform.GetComponent<LobbyListSingleUI>().SetLobby(lobby);
         }
+    }
+
+    private bool IsLobbyActive(Lobby lobby)
+    {
+        if (lobby == null)
+            return false;
+
+        if (lobby.Players == null || lobby.Players.Count == 0)
+            return false;
+
+        if (lobby.Data == null)
+            return false;
+
+        if (!lobby.Data.ContainsKey("RelayJoinCode") || string.IsNullOrEmpty(lobby.Data["RelayJoinCode"].Value))
+            return false;
+
+        return true;
     }
 }
