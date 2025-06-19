@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.Animations.Rigging;
 using System.Collections.Generic;
 using System.Linq;
+using TMPro;
 
 public class PlayerController : NetworkBehaviour, IDamageable
 {
@@ -11,7 +12,7 @@ public class PlayerController : NetworkBehaviour, IDamageable
     [SerializeField] GameObject aimTransform;
     [SerializeField] GameObject cameraObject;
     [SerializeField] private Camera playerCamera;
-    [SerializeField] private List<Transform> adsPositions; // Список позицій ADS для кожної зброї
+    [SerializeField] private List<Transform> adsPositions;
     [SerializeField] private Transform owPosition;
     [SerializeField] private Transform weaponRoot;
     [SerializeField] private float aimSpeed = 10f;
@@ -28,6 +29,7 @@ public class PlayerController : NetworkBehaviour, IDamageable
     [SerializeField] private float fovSpeed = 10f;
 
     [SerializeField] private float rotationSmoothSpeed = 10f;
+
     private Quaternion targetRotation;
 
     private float targetFOV;
@@ -46,15 +48,19 @@ public class PlayerController : NetworkBehaviour, IDamageable
     private float moveSpeed = 5f;
     private Animator animator;
 
-    private bool isAlive = true;
+    public bool isAlive = true;
     private bool isAiming;
     private bool isGrounded = true;
+    public bool isRespawning = false;
 
     private bool canJump = true;
 
     private TickRunner networkTickRunner = new TickRunner();
 
     private Vector3 targetPosition;
+
+    private float respawnTimer = 5f;
+    private float respawnCountdown;
 
     private void Start()
     {
@@ -87,7 +93,11 @@ public class PlayerController : NetworkBehaviour, IDamageable
     {
         if (!IsOwner) return;
 
-        if (!isAlive) return;
+        if (!isAlive)
+        {
+            HandleRespawnCountdown();
+            return; // Блокуємо всі дії, якщо гравець мертвий
+        }
 
         Look();
 
@@ -126,21 +136,44 @@ public class PlayerController : NetworkBehaviour, IDamageable
         {
             Die();
         }
+
+        // Блокуємо доступ до меню (Escape) під час респавну
+        if (Input.GetKeyDown(KeyCode.Escape) && !isRespawning)
+        {
+            bool isActive = GameObject.Find("GameMenu")?.GetComponent<GameMenu>()?.gameObject.activeSelf ?? false;
+            GameObject.Find("GameMenu")?.GetComponent<GameMenu>()?.gameObject.SetActive(!isActive);
+
+            Cursor.lockState = isActive ? CursorLockMode.Locked : CursorLockMode.None;
+            Cursor.visible = !isActive;
+        }
+    }
+
+    private void HandleRespawnCountdown()
+    {
+        if (isRespawning)
+        {
+            respawnCountdown -= Time.deltaTime;
+
+            if (respawnCountdown <= 0)
+            {
+                isRespawning = false;
+                GetComponent<PlayerSettings>()?.RequestRespawn();
+            }
+        }
     }
 
     private void HandleMovementInput()
     {
+        if (!isAlive || isRespawning) return;
+
         Vector3 moveDir = new Vector3(Input.GetAxisRaw("Horizontal"), 0, Input.GetAxisRaw("Vertical")).normalized;
-        bool isSprinting = Input.GetKey(KeyCode.LeftShift); // Передаємо стан спринту
+        bool isSprinting = Input.GetKey(KeyCode.LeftShift);
         HandleMovementServerRpc(moveDir, isSprinting);
     }
 
     private void Look()
     {
-        if (Cursor.lockState == CursorLockMode.None)
-        {
-            return;
-        }
+        if (!isAlive || isRespawning || Cursor.lockState == CursorLockMode.None) return;
 
         transform.Rotate(Vector3.up * Input.GetAxisRaw("Mouse X") * mouseSensitivity);
 
@@ -171,7 +204,7 @@ public class PlayerController : NetworkBehaviour, IDamageable
 
     void EquipItem(int _index)
     {
-        if (_index == previousItemIndex) return;
+        if (_index == previousItemIndex || !isAlive || isRespawning) return;
 
         itemIndex = _index;
 
@@ -187,7 +220,7 @@ public class PlayerController : NetworkBehaviour, IDamageable
     [ClientRpc]
     private void EquipItemClientRpc(int _index)
     {
-        if (_index == previousItemIndex || items == null || _index < 0 || _index >= items.Length)
+        if (_index == previousItemIndex || items == null || _index < 0 || _index >= items.Length || !isAlive || isRespawning)
         {
             Debug.LogWarning($"EquipItemClientRpc failed: index={_index}, items={(items == null ? "null" : items.Length.ToString())}");
             return;
@@ -207,7 +240,7 @@ public class PlayerController : NetworkBehaviour, IDamageable
 
     private void Jump()
     {
-        if (!IsOwner) return;
+        if (!IsOwner || !isAlive || isRespawning) return;
 
         JumpServerRpc();
     }
@@ -228,19 +261,21 @@ public class PlayerController : NetworkBehaviour, IDamageable
 
     private void OnCollisionEnter(Collision collision)
     {
+        if (!isAlive || isRespawning) return;
         isGrounded = true;
         Invoke(nameof(ResetJump), 3f);
     }
 
     private void ResetJump()
     {
+        if (!isAlive || isRespawning) return;
         canJump = true;
     }
 
     [ServerRpc]
     private void HandleMovementServerRpc(Vector3 moveDir, bool isSprinting)
     {
-        // Обчислюємо швидкість руху на сервері, використовуючи дані від клієнта
+        if (!isAlive || isRespawning) return;
         moveAmount = moveDir * (isSprinting ? sprintSpeed : walkSpeed);
         UpdateAnimationClientRpc(moveDir.magnitude);
     }
@@ -248,7 +283,7 @@ public class PlayerController : NetworkBehaviour, IDamageable
     [ClientRpc]
     private void UpdateAnimationClientRpc(float speed)
     {
-        if (animator != null)
+        if (animator != null && !isRespawning)
         {
             animator.SetFloat("Speed", speed);
         }
@@ -285,6 +320,8 @@ public class PlayerController : NetworkBehaviour, IDamageable
 
     private void Aim()
     {
+        if (!isAlive || isRespawning) return;
+
         if (Input.GetMouseButton(1))
         {
             isAiming = true;
@@ -295,7 +332,6 @@ public class PlayerController : NetworkBehaviour, IDamageable
             isAiming = false;
         }
 
-        // Отримуємо активну зброю і її ADS позицію
         SingleShotGun weaponData = items[itemIndex].GetComponent<SingleShotGun>();
         Transform currentAdsPosition = (weaponData != null) ? weaponData.ADSPosition : owPosition;
         Vector3 targetPos = isAiming ? currentAdsPosition.position : owPosition.position;
@@ -317,6 +353,9 @@ public class PlayerController : NetworkBehaviour, IDamageable
 
     public void Die()
     {
+        if (isRespawning) return;
+        isRespawning = true;
+        respawnCountdown = respawnTimer;
         ActivateRagdollClientRpc();
     }
 
@@ -330,6 +369,7 @@ public class PlayerController : NetworkBehaviour, IDamageable
     public void Resurrect()
     {
         isAlive = true;
+        isRespawning = false;
     }
 
     public void SetClass(int classIndex)
@@ -361,7 +401,6 @@ public class PlayerController : NetworkBehaviour, IDamageable
             .Select(w => w.GetComponent<Item>())
             .ToArray();
 
-        // Перевірка відповідності кількості adsPositions і allItems
         if (adsPositions != null && adsPositions.Count != allItems.Length)
         {
             Debug.LogWarning($"Number of adsPositions ({adsPositions.Count}) does not match number of allItems ({allItems.Length}). Ensure they are synchronized!");

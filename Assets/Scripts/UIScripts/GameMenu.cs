@@ -168,7 +168,7 @@ public class GameMenu : MonoBehaviour
 
     private void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Escape))
+        if (Input.GetKeyDown(KeyCode.Escape) && playerController != null && playerController.isAlive && !playerController.isRespawning)
         {
             bool isActive = gameMenu.activeSelf;
             gameMenu.SetActive(!isActive);
