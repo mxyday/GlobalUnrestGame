@@ -26,6 +26,14 @@ public class PlayerSettings : NetworkBehaviour
 
     public List<SingleShotGun> playerWeapons = new List<SingleShotGun>();
 
+    // Додатковий список кольорів для команд
+    [SerializeField]
+    private List<Color> teamColors = new List<Color>
+    {
+        Color.red,     // Команда 0
+        Color.blue     // Команда 1
+    };
+
     private void Awake()
     {
         skinnedMeshRenderer = GetComponentInChildren<SkinnedMeshRenderer>();
@@ -62,11 +70,12 @@ public class PlayerSettings : NetworkBehaviour
         }
 
         if (playerName != null)
-            playerName.text = networkPlayerName.Value.ToString();
+            playerName.text = ApplyColorToName(networkPlayerName.Value.ToString());
 
         networkPlayerName.OnValueChanged += (oldValue, newValue) =>
         {
-            playerName.text = newValue.ToString();
+            if (playerName != null)
+                playerName.text = ApplyColorToName(newValue.ToString());
         };
 
         StartCoroutine(InitializePlayer());
@@ -74,6 +83,9 @@ public class PlayerSettings : NetworkBehaviour
         ownerTeamId.OnValueChanged += (oldValue, newValue) =>
         {
             UpdateTeam(newValue);
+            if (playerName != null)
+                playerName.text = ApplyColorToName(networkPlayerName.Value.ToString()); // Оновлюємо колір при зміні команди
+            Debug.Log($"Team changed to {newValue}, applying color to playerName");
         };
     }
 
@@ -197,5 +209,20 @@ public class PlayerSettings : NetworkBehaviour
     public int GetTeamIndex()
     {
         return ownerTeamId.Value;
+    }
+
+    // Метод для додавання кольору до імені
+    private string ApplyColorToName(string name)
+    {
+        if (playerName == null || teamColors == null || teamColors.Count == 0 || ownerTeamId.Value < 0 || ownerTeamId.Value >= teamColors.Count)
+        {
+            Debug.LogWarning($"Cannot apply color: playerName={playerName}, teamColors.Count={teamColors.Count}, ownerTeamId={ownerTeamId.Value}");
+            return name; // Повертаємо без кольору, якщо щось не ініціалізовано
+        }
+
+        Color teamColor = teamColors[ownerTeamId.Value];
+        string colorHex = ColorUtility.ToHtmlStringRGB(teamColor);
+        Debug.Log($"Applying color #{colorHex} to {name} for team {ownerTeamId.Value}");
+        return $"<color=#{colorHex}>{name}</color>";
     }
 }

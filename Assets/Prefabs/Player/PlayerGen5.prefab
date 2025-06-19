@@ -3736,6 +3736,8 @@ MonoBehaviour:
   aimFOV: 40
   fovSpeed: 10
   rotationSmoothSpeed: 10
+  isAlive: 1
+  isRespawning: 0
 --- !u!114 &2424526863066209547
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3890,6 +3892,9 @@ MonoBehaviour:
   - {fileID: 5913093737625944337}
   - {fileID: 8528341528103645016}
   - {fileID: 4090461848585193727}
+  teamColors:
+  - {r: 0, g: 1, b: 0.9411765, a: 1}
+  - {r: 1, g: 0.59607846, b: 0, a: 1}
 --- !u!114 &6084286929132840623
 MonoBehaviour:
   m_ObjectHideFlags: 0
