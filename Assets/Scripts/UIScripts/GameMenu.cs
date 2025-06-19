@@ -1,6 +1,7 @@
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.UI;
+using System.Collections;
 
 public class GameMenu : MonoBehaviour
 {
@@ -80,13 +81,23 @@ public class GameMenu : MonoBehaviour
             GameMenuDeactivate();
         });
 
-        aTeamButton.onClick.AddListener(() => {
-            playerSettings.RequestChangeTeam(0);
+        aTeamButton.onClick.AddListener(() =>
+        {
+            if (playerSettings != null)
+            {
+                playerSettings.RequestChangeTeam(0);
+                StartCoroutine(WaitForTeamChange(0));
+            }
             TeamSelectMenuDeactivate();
         });
 
-        bTeamButton.onClick.AddListener(() => {
-            playerSettings.RequestChangeTeam(1);
+        bTeamButton.onClick.AddListener(() =>
+        {
+            if (playerSettings != null)
+            {
+                playerSettings.RequestChangeTeam(1);
+                StartCoroutine(WaitForTeamChange(1));
+            }
             TeamSelectMenuDeactivate();
         });
 
@@ -107,31 +118,52 @@ public class GameMenu : MonoBehaviour
 
         RiflemanButton.onClick.AddListener(() =>
         {
-            playerController.SetClass(0);
-            playerSettings.RequestRespawn();
+            if (playerController != null)
+            {
+                playerController.SetClass(0);
+                playerSettings.RequestRespawn();
+            }
             ClassSelectMenuDeactivate();
         });
 
         ScoutButton.onClick.AddListener(() =>
         {
-            playerController.SetClass(3);
-            playerSettings.RequestRespawn();
+            if (playerController != null)
+            {
+                playerController.SetClass(3);
+                playerSettings.RequestRespawn();
+            }
             ClassSelectMenuDeactivate();
         });
 
         MachinegunnerButton.onClick.AddListener(() =>
         {
-            playerController.SetClass(2);
-            playerSettings.RequestRespawn();
+            if (playerController != null)
+            {
+                playerController.SetClass(2);
+                playerSettings.RequestRespawn();
+            }
             ClassSelectMenuDeactivate();
         });
 
         BreacherButton.onClick.AddListener(() =>
         {
-            playerController.SetClass(1);
-            playerSettings.RequestRespawn();
+            if (playerController != null)
+            {
+                playerController.SetClass(1);
+                playerSettings.RequestRespawn();
+            }
             ClassSelectMenuDeactivate();
         });
+    }
+
+    private IEnumerator WaitForTeamChange(int teamIndex)
+    {
+        yield return new WaitForSeconds(0.5f);
+        if (playerSettings != null && playerSettings.GetTeamIndex() == teamIndex)
+        {
+            playerSettings.RequestRespawn();
+        }
     }
 
     private void Update()

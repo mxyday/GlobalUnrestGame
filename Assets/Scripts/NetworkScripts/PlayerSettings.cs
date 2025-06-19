@@ -16,7 +16,7 @@ public class PlayerSettings : NetworkBehaviour
 
     public Transform spawnPoint;
 
-    private List<GameObject> spawnPoints; // більше не задається в інспекторі, отримаємо через метод
+    private List<GameObject> spawnPoints;
 
     private NetworkVariable<FixedString128Bytes> networkPlayerName = new NetworkVariable<FixedString128Bytes>(
         "Player: 0", NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
@@ -39,18 +39,24 @@ public class PlayerSettings : NetworkBehaviour
 
         SetSpawnPoints(SpawnPointManager.Instance.spawnPoints);
 
-        // Чекаємо, поки команда буде встановлена
-        while (ownerTeamId.Value == 0 && !IsServer) // або -1, якщо 0 допустима команда
+        while (ownerTeamId.Value == 0 && !IsServer)
             yield return null;
 
-        UpdateTeam(ownerTeamId.Value);
-        if (IsOwner)
+        if (!UpdateTeam(ownerTeamId.Value))
+        {
+            yield return new WaitForSeconds(1f);
+            UpdateTeam(ownerTeamId.Value);
+        }
+
+        if (IsOwner && spawnPoint != null)
             RequestRespawn();
+        else
+            Debug.LogWarning("Spawn point not initialized on start.");
     }
 
     public override void OnNetworkSpawn()
     {
-        if (IsOwner) // Тільки власник об'єкта ініціалізує ім'я
+        if (IsOwner)
         {
             SetPlayerNameServerRpc("Player: " + (OwnerClientId + 1));
         }
@@ -58,7 +64,6 @@ public class PlayerSettings : NetworkBehaviour
         if (playerName != null)
             playerName.text = networkPlayerName.Value.ToString();
 
-        // Підписка на зміни імені
         networkPlayerName.OnValueChanged += (oldValue, newValue) =>
         {
             playerName.text = newValue.ToString();
@@ -87,11 +92,12 @@ public class PlayerSettings : NetworkBehaviour
             if (spawnPoints != null && teamIndex < spawnPoints.Count && spawnPoints[teamIndex] != null)
             {
                 spawnPoint = spawnPoints[teamIndex].transform;
+                Debug.Log($"Updated spawnPoint to {spawnPoint.position} for team {teamIndex}");
                 return true;
             }
             else
             {
-                Debug.LogWarning("Spawn point for team not assigned or out of range.");
+                Debug.LogWarning($"Spawn point for team {teamIndex} not assigned or out of range.");
             }
         }
         return false;
@@ -109,8 +115,14 @@ public class PlayerSettings : NetworkBehaviour
         Debug.Log($"[Server] Changing team to {teamIndex} for player {OwnerClientId}");
 
         ownerTeamId.Value = teamIndex;
-        UpdateTeam(teamIndex);
-        RequestRespawn();
+        if (UpdateTeam(teamIndex) && IsServer)
+        {
+            RequestRespawn();
+        }
+        else
+        {
+            Debug.LogWarning($"Failed to update team {teamIndex}, spawn point not set.");
+        }
     }
 
     public void RequestRespawn()
@@ -125,33 +137,46 @@ public class PlayerSettings : NetworkBehaviour
     private void RespawnRequestServerRpc(ServerRpcParams rpcParams = default)
     {
         Respawn();
+        RespawnClientRpc();
+    }
+
+    [ClientRpc]
+    private void RespawnClientRpc()
+    {
+        if (IsOwner) return;
+
+        playerController.Resurrect();
+
+        if (ragdollActivator != null)
+            ragdollActivator.DeactivateRagdoll();
+
+        foreach (SingleShotGun weapon in playerWeapons)
+        {
+            weapon.RestoreAmmo();
+            Debug.Log($"[Client] Restored ammo for {weapon.name}");
+        }
     }
 
     public void Respawn()
     {
-        if (spawnPoint != null)
+        if (!IsServer || spawnPoint == null) return;
+
+        var netTransform = GetComponent<NetworkTransform>();
+        if (netTransform != null)
         {
-            var netTransform = GetComponent<NetworkTransform>();
-            if (netTransform != null)
-            {
-                netTransform.Teleport(spawnPoint.position, spawnPoint.rotation, transform.localScale);
-            }
-
-            playerController.Resurrect();
-
-            if (ragdollActivator != null)
-                ragdollActivator.DeactivateRagdoll();
-
-            foreach (SingleShotGun weapon in playerWeapons)
-            {
-                weapon.RestoreAmmo();
-                Debug.Log($"Restored ammo for {weapon}");
-            }
+            netTransform.Teleport(spawnPoint.position, spawnPoint.rotation, transform.localScale);
+            Debug.Log($"[Server] Teleported to {spawnPoint.position}");
         }
-        else
+
+        playerController.Resurrect();
+
+        if (ragdollActivator != null)
+            ragdollActivator.DeactivateRagdoll();
+
+        foreach (SingleShotGun weapon in playerWeapons)
         {
-            Debug.LogWarning("No valid spawn point set. Retrying...");
-            StartCoroutine(RetryRespawn());
+            weapon.RestoreAmmo();
+            Debug.Log($"[Server] Restored ammo for {weapon.name}");
         }
     }
 
@@ -159,14 +184,14 @@ public class PlayerSettings : NetworkBehaviour
     {
         yield return new WaitForSeconds(0.5f);
         UpdateTeam(ownerTeamId.Value);
-        if (IsOwner)
+        if (IsOwner && spawnPoint != null)
             RequestRespawn();
     }
 
     public void SetSpawnPoints(List<GameObject> points)
     {
         spawnPoints = points;
-        UpdateTeam(ownerTeamId.Value); // одразу оновимо спавн
+        UpdateTeam(ownerTeamId.Value);
     }
 
     public int GetTeamIndex()
